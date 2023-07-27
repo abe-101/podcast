@@ -17,6 +17,7 @@ The Podcast Automation project is a Python-based tool that automates the process
 - [Dependencies](#dependencies)
 - [Contributing](#contributing)
 - [License](#license)
+
 ## Features
 
 - Download YouTube videos and convert them to high-quality MP3 files.
@@ -32,6 +33,8 @@ The Podcast Automation project is a Python-based tool that automates the process
 
    ```bash
    git clone https://github.com/abe-101/podcast.git
+   ```
+
 ## Usage
 
 The script will prompt you to select a playlist/podcast from the available options.
@@ -42,6 +45,7 @@ The resulting podcasts will be uploaded and published on Captivate.fm with metad
 ## Configuration
 
 The project uses a configuration file named `config.json` to store data for multiple playlists/podcasts. The configuration file includes information such as API keys, playlist IDs, directory paths, and URLs. You can modify this file to add, remove, or update playlist data as needed.
+
 ```json
 {
   "playlists": [
@@ -70,6 +74,7 @@ The project uses a configuration file named `config.json` to store data for mult
   ]
 }
 ```
+
 ## Dependencies
 
 The project utilizes the following Python libraries:
@@ -90,4 +95,3 @@ This project is licensed under the MIT License. See the [LICENSE](https://github
 ---
 
 Happy Podcasting! 🎙️
-
