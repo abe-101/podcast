@@ -4,7 +4,7 @@ from datetime import datetime
 import requests
 
 from .audio_conversion import normalize_volume
-from .configuration_manager import ConfigurationManager, LocalMedia
+from .configuration_manager import ConfigurationManager, LocalMedia, PodcastInfo
 
 
 def format_date(date: datetime) -> str | None:
@@ -214,10 +214,12 @@ def update_podcast(
 
 def publish_podcast(
     local_media: LocalMedia,
-    show: dict[str, str],
+    podcast: PodcastInfo,
+    # show: dict[str, str],
     config: ConfigurationManager,
     episode_num: str = "1",
     logger: logging.Logger = logging.getLogger(__name__),
+    publish: bool = True,
 ) -> str:
     """
     Publishes an audio file as a new podcast episode on CaptivateFM.
@@ -235,7 +237,7 @@ def publish_podcast(
         ValueError: If any required keys are missing from the info or show dictionaries.
     """
     formatted_upload_date = format_date(local_media.upload_date)
-    show_id = show["show_id"]
+    show_id = podcast.podcast_show_id
     media_id = upload_media(config=config, show_id=show_id, file_name=local_media.file_name)
 
     video_id = local_media.url[-11:]
@@ -245,7 +247,10 @@ def publish_podcast(
 \nBrought to you by: <b><a href='https://www.shiurim.net/'>Shiurim.net</a></b>
 Contact us for all your podcast needs: <a href='mailto:podcast@shiurim.net'>podcast@shiurim.net</a>\n
     """
-    shownotes = local_media.description + youtube + brought_by
+    if local_media.url == "":
+        shownotes = local_media.description + brought_by
+    else:
+        shownotes = local_media.description + youtube + brought_by
     episode_id = create_podcast(
         config=config,
         media_id=media_id,
@@ -255,5 +260,6 @@ Contact us for all your podcast needs: <a href='mailto:podcast@shiurim.net'>podc
         shows_id=show_id,
         episode_number=episode_num,
         episode_art=local_media.thumbnail,
+        status="Publish" if publish else "Draft",
     )
     return episode_id

@@ -1,8 +1,9 @@
 import base64
-import os
 from datetime import datetime
 
 import requests
+
+from podcast import config
 
 
 class PodcastInfo:
@@ -15,6 +16,7 @@ class PodcastInfo:
         self.rss: str = data.get("rss", "")
         self.playlist_id: str = data.get("playlist_id", "")
         self.google_url: str | None = data.get("google_url", None)
+        self.channel_id: str | None = data.get("channel_id", None)
 
 
 class LocalMedia:
@@ -61,111 +63,22 @@ class LocalMedia:
 
 class ConfigurationManager:
     def __init__(self):
-        self.CAPTIVATE_USER_ID = os.getenv("CAPTIVATE_USER_ID")
-        self.CAPTIVATE_API_KEY = os.getenv("CAPTIVATE_API_KEY")
+        self.CAPTIVATE_USER_ID = config.CAPTIVATE_USER_ID
+        self.CAPTIVATE_API_KEY = config.CAPTIVATE_API_KEY
 
-        self.pls = {
-            "show_id": os.getenv("PLS_SHOW_ID"),
-            "spotify_id": os.getenv("PLS_SPOTIFY_ID"),
-            "dir": os.getenv("PLS_DIR"),
-            "apple_url": os.getenv("PLS_APPLE_URL"),
-            "rss": os.getenv("PLS_RSS"),
-            "playlist_id": os.getenv("PLS_PLAYLIST_ID"),
-        }
-        self.gittin = {
-            "show_id": os.getenv("GITTIN_SHOW_ID"),
-            "spotify_id": os.getenv("GITTIN_SPOTIFY_ID"),
-            "dir": os.getenv("GITTIN_DIR"),
-            "apple_url": os.getenv("GITTIN_APPLE_URL"),
-            "rss": os.getenv("GITTIN_RSS"),
-            "playlist_id": os.getenv("GITTIN_PLAYLIST_ID"),
-        }
-        self.halacha = {
-            "show_id": os.getenv("HALACHA_SHOW_ID"),
-            "spotify_id": os.getenv("HALACHA_SPOTIFY_ID"),
-            "dir": os.getenv("HALACHA_DIR"),
-            "apple_url": os.getenv("HALACHA_APPLE_URL"),
-            "rss": os.getenv("HALACHA_RSS"),
-            "playlist_id": os.getenv("HALACHA_PLAYLIST_ID"),
-        }
-        self.kolel = {
-            "show_id": os.getenv("KOLEL_SHOW_ID"),
-            "spotify_id": os.getenv("KOLEL_SPOTIFY_ID"),
-            "dir": os.getenv("KOLEL_DIR"),
-            "apple_url": os.getenv("KOLEL_APPLE_URL"),
-            "rss": os.getenv("KOLEL_RSS"),
-            "playlist_id": os.getenv("KOLEL_PLAYLIST_ID"),
-        }
-        self.sg_chassidus = {
-            "show_id": os.getenv("SG_CHASSIDUS_SHOW_ID"),
-            "spotify_id": os.getenv("SG_CHASSIDUS_SPOTIFY_ID"),
-            "dir": os.getenv("SG_CHASSIDUS_DIR"),
-            "apple_url": os.getenv("SG_CHASSIDUS_APPLE_URL"),
-            "rss": os.getenv("SG_CHASSIDUS_RSS"),
-            "playlist_id": os.getenv("SG_CHASSIDUS_PLAYLIST_ID"),
-        }
-        self.shuchat = {
-            "show_id": os.getenv("SHUCHAT_SHOW_ID"),
-            "spotify_id": os.getenv("SHUCHAT_SPOTIFY_ID"),
-            "dir": os.getenv("SHUCHAT_DIR"),
-            "apple_url": os.getenv("SHUCHAT_APPLE_URL"),
-            "rss": os.getenv("SHUCHAT_RSS"),
-            "playlist_id": os.getenv("SHUCHAT_PLAYLIST_ID"),
-        }
-        self.rm_torah = {
-            "show_id": os.getenv("RM_TORAH_SHOW_ID"),
-            "spotify_id": os.getenv("RM_TORAH_SPOTIFY_ID"),
-            "dir": os.getenv("RM_TORAH_DIR"),
-            "apple_url": os.getenv("RM_TORAH_APPLE_URL"),
-            "rss": os.getenv("RM_TORAH_RSS"),
-            "playlist_id": os.getenv("RM_TORAH_PLAYLIST_ID"),
-        }
-        self.rm_maamor = {
-            "show_id": os.getenv("RM_MAAMOR_SHOW_ID"),
-            "spotify_id": os.getenv("RM_MAAMOR_SPOTIFY_ID"),
-            "dir": os.getenv("RM_MAAMOR_DIR"),
-            "apple_url": os.getenv("RM_MAAMOR_APPLE_URL"),
-            "rss": os.getenv("RM_MAAMOR_RSS"),
-            "playlist_id": os.getenv("RM_MAAMOR_PLAYLIST_ID"),
-        }
-        self.rm_tanya = {
-            "show_id": os.getenv("RM_TANYA_SHOW_ID"),
-            "spotify_id": os.getenv("RM_TANYA_SPOTIFY_ID"),
-            "dir": os.getenv("RM_TANYA_DIR"),
-            "apple_url": os.getenv("RM_TANYA_APPLE_URL"),
-            "rss": os.getenv("RM_TANYA_RSS"),
-            "playlist_id": os.getenv("RM_TANYA_PLAYLIST_ID"),
-        }
-        self.rm_happy = {
-            "show_id": os.getenv("RM_HAPPY_SHOW_ID"),
-            "spotify_id": os.getenv("RM_HAPPY_SPOTIFY_ID"),
-            "dir": os.getenv("RM_HAPPY_DIR"),
-            "apple_url": os.getenv("RM_HAPPY_APPLE_URL"),
-            "rss": os.getenv("RM_HAPPY_RSS"),
-            "playlist_id": os.getenv("RM_HAPPY_PLAYLIST_ID"),
-        }
+        self.IMGUR_CLIENT_ID = config.IMGUR_CLIENT_ID
+        self.IMGUR_CLIENT_SECRET = config.IMGUR_CLIENT_SECRET
 
-        self.IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
-        self.IMGUR_CLIENT_SECRET = os.getenv("IMGUR_CLIENT_SECRET")
+        # self.PROJECT_DIR = os.getenv("PROJECT_DIR")
+        self.PLAYWRITE_HEADLESS = True if config.PLAYWRIGHT_HEADLESS == "True" else False
 
-        self.PROJECT_DIR = os.getenv("PROJECT_DIR")
-        self.PLAYWRITE_HEADLESS = True if os.getenv("PLAYWRIGHT_HEADLESS") == "True" else False
+        self.SPOTIFY_CLIENT_ID = config.SPOTIFY_CLIENT_ID
+        self.SPOTIFY_CLIENT_SECRET = config.SPOTIFY_CLIENT_SECRET
 
-        self.CLIENT_ID = os.getenv("CLIENT_ID")
-        self.CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-
-        self.KOLEL_SPOTIFY_ID = os.getenv("KOLEL_SPOTIFY_ID")
-
-        self.ANCHOR_EMAIL = os.getenv("ANCHOR_EMAIL")
-        self.ANCHOR_PASSWORD = os.getenv("ANCHOR_PASSWORD")
-        self.LOAD_THUMBNAIL = True if os.getenv("LOAD_THUMBNAIL") == "True" else False
-        self.PUPETEER_HEADLESS = False
         self.CAPTIVATE_TOKEN = None
         self.SPOTIFY_TOKEN = None
-        self.SPOTIFY_PODCAST_PUBLISH = True if os.getenv("SPOTIFY_PODCAST_PUBLISH") == "True" else False
-        self.YOUTUBE_API = os.getenv("YOUTUBE_API")
-        self.KOLEL_YOUTUBE_CHANNEL_ID = os.getenv("KOLEL_YOUTUBE_CHANNEL_ID")
-        self.TINY_URL_API_KEY = os.getenv("TINY_URL_API_KEY")
+        self.YOUTUBE_API = config.YOUTUBE_API_KEY
+        self.TINY_URL_API_KEY = config.TINYURL_API_KEY
 
     def get_captivate_token(self):
         if self.CAPTIVATE_TOKEN is None:
@@ -206,7 +119,7 @@ class ConfigurationManager:
 
     def get_spotify_token(self):
         if not self.SPOTIFY_TOKEN:
-            self.SPOTIFY_TOKEN = self._get_spotify_access_token(self.CLIENT_ID, self.CLIENT_SECRET)
+            self.SPOTIFY_TOKEN = self._get_spotify_access_token(self.SPOTIFY_CLIENT_ID, self.SPOTIFY_CLIENT_SECRET)
         return self.SPOTIFY_TOKEN
 
     def _get_spotify_access_token(self, client_id: str, client_secret: str) -> str:

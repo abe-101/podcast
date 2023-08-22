@@ -13,6 +13,8 @@ from .utils import (  # NOQA: F401
 )
 from .utils.configuration_manager import ConfigurationManager, LocalMedia, PodcastInfo  # NOQA: F401
 
+config_manager = ConfigurationManager()
+
 # Configure the logger
 logger = logging.getLogger("Podcast")
 logger.setLevel(logging.INFO)
@@ -73,8 +75,46 @@ def prompt_user_for_playlist():
     return podcast
 
 
-def youtube_to_captivate(podcast: PodcastInfo, artwork: str = "", publish: bool = True, enhance: bool = False):
-    media: LocalMedia = download_yt.download_youtube_video(podcast.youtube_url)
+def file_to_captivate(
+    podcast: PodcastInfo,
+    file: str,
+    title: str = None,
+    desc: str = "",
+    artwork: str = "",
+    publish: bool = True,
+    enhance: bool = False,
+    episode_num: str = "1",
+) -> LocalMedia:
+    if title is None:
+        title = file.split("/")[-1].split(".")[0]
+
+    media: LocalMedia = LocalMedia(file_name=file, title=title, description=title + "\n" + desc, thumbnail=artwork)
+    if enhance:
+        media.file_name = adobe_podcast.enhance_podcast(media.file_name, config_manager)
+    captivate_api.publish_podcast(media, podcast, config_manager, episode_num, publish=True)
+    return media
+
+
+def file_to_youtube(podcast: PodcastInfo, file: str, title: str = None, desc: str = "", artwork: str = ""):
+    if title is None:
+        title = file.split("/")[-1].split(".")[0]
+
+    media: LocalMedia = LocalMedia(file_name=file, title=title, description=title + "\n" + desc, thumbnail=artwork)
+
+    media.file_name = audio_conversion.create_video_from_audio_and_picture(
+        file, artwork, podcast.dir + "/" + title + ".mp4"
+    )
+    print("Uploading video to YouTube")
+    youtube_url = upload_video.upload_video_with_options(
+        media, privacyStatus="private", playlist_id=podcast.playlist_id, channel_id=podcast.channel_id
+    )
+    print(f"Video uploaded to YouTube: {youtube_url}")
+
+
+def youtube_to_captivate(
+    podcast: PodcastInfo, url: str, artwork: str = "", publish: bool = True, enhance: bool = False
+):
+    media: LocalMedia = download_yt.download_youtube_video(url)
     if artwork != "":
         media.thumbnail = artwork
     if enhance:

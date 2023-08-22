@@ -14,7 +14,9 @@ from googleapiclient.http import MediaFileUpload
 
 from .configuration_manager import ConfigurationManager, LocalMedia  # NOQA: F401
 
-Options = namedtuple("Options", ["file", "title", "description", "category", "keywords", "privacyStatus"])
+Options = namedtuple(
+    "Options", ["file", "title", "description", "category", "keywords", "privacyStatus", "channel_id"]
+)
 
 
 # tell HTTP library not to retry because we are handling the logic ourselves
@@ -139,7 +141,11 @@ def initialize_upload(youtube, options):
         "status": {"privacyStatus": options.privacyStatus, "selfDeclaredMadeForKids": "false"},
     }
     insert_request = youtube.videos().insert(
-        part=",".join(body.keys()), body=body, media_body=MediaFileUpload(options.file, chunksize=-1, resumable=True)
+        onBehalfOfContentOwner=options.channel_id[2:],
+        onBehalfOfContentOwnerChannel=options.channel_id,
+        part=",".join(body.keys()),
+        body=body,
+        media_body=MediaFileUpload(options.file, chunksize=-1, resumable=True),
     )
     video_url = resumable_upload(insert_request)
     return video_url
@@ -151,6 +157,7 @@ def upload_video_with_options(
     keywords: str = "",
     privacyStatus: str = "private",
     playlist_id: str = "",
+    channel_id: str = "",
 ):
     options = Options(
         file=localMedia.file_name,
@@ -159,6 +166,7 @@ def upload_video_with_options(
         category=category,
         keywords=keywords,
         privacyStatus=privacyStatus,
+        channel_id=channel_id,
     )
     # Disable OAUTHlib's https verification locally. DO NOT USE in production.
     os.environ["OUATHLIB_INSECURE_TRANSPORT"] = "1"
