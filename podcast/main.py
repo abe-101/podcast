@@ -2,7 +2,15 @@ import logging
 
 import podcast.config as config
 
-from .utils import adobe_podcast, audio_conversion, captivate_api, download_yt, spotify, upload_video  # NOQA: F401
+from .utils import (  # NOQA: F401
+    adobe_podcast,
+    audio_conversion,
+    captivate_api,
+    download_yt,
+    spotify,
+    tiny_url,
+    upload_video,
+)
 from .utils.configuration_manager import ConfigurationManager, LocalMedia, PodcastInfo  # NOQA: F401
 
 # Configure the logger
@@ -30,6 +38,28 @@ logger.addHandler(console_handler)
 
 def hello_world():
     print("Hello World!")
+
+
+def create_show_short_links(postcast: PodcastInfo):
+    """
+    Create tinyurl on the my.shiurimm.net domain for the
+    podcast on various platforms like apple, google, spotify, YouTube.
+    """
+    creator: tiny_url.TinyURLAPI = tiny_url.TinyURLAPI(config.TINYURL_API_KEY)
+    print(f"Apple: {postcast.apple_url}")
+    apple_url = creator.get_or_create_alias_url(postcast.apple_url, postcast.name + "-Apple")
+    print(f"Apple: {apple_url}")
+
+    # google_url = creator.get_or_create_alias_url(postcast.google_url, postcast.name + "-Google")
+    # print(f"Google: {google_url}")
+
+    spotify_long_url = "https://open.spotify.com/show/" + postcast.spotify_id
+    spotify_url = creator.get_or_create_alias_url(spotify_long_url, postcast.name + "-Spotify")
+    print(f"Spotify: {spotify_url}")
+
+    youtube_long_url = "https://www.youtube.com/playlist?list=" + postcast.playlist_id
+    youtube_url = creator.get_or_create_alias_url(youtube_long_url, postcast.name + "-YouTube")
+    print(f"YouTube: {youtube_url}")
 
 
 def prompt_user_for_playlist():
