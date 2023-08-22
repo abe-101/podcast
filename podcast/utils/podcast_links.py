@@ -1,8 +1,9 @@
 import feedparser
 import requests
 from bs4 import BeautifulSoup
-from configuration_manager import ConfigurationManager
-from spotify import get_latest_spotify_episode_link
+
+from .configuration_manager import ConfigurationManager
+from .spotify import get_latest_spotify_episode_link
 
 
 class Links:

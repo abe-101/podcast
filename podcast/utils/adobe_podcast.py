@@ -1,9 +1,10 @@
 import logging
 import os
 
-from audio_conversion import convert_wav_to_mp3
-from configuration_manager import ConfigurationManager
 from playwright.sync_api import Playwright, sync_playwright
+
+from .audio_conversion import convert_wav_to_mp3
+from .configuration_manager import ConfigurationManager
 
 
 # Function to run the audio enhancement process using Adobe Podcast

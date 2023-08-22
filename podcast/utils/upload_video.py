@@ -5,7 +5,6 @@ import random
 from collections import namedtuple
 
 import httplib2
-from configuration_manager import LocalMedia
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -13,10 +12,9 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 
-Options = namedtuple(
-    "Options",
-    ["file", "title", "description", "category", "keywords", "privacyStatus"],
-)
+from .configuration_manager import ConfigurationManager, LocalMedia  # NOQA: F401
+
+Options = namedtuple("Options", ["file", "title", "description", "category", "keywords", "privacyStatus"])
 
 
 # tell HTTP library not to retry because we are handling the logic ourselves
@@ -138,15 +136,10 @@ def initialize_upload(youtube, options):
             "tags": tags,
             "categoryId": options.category,
         },
-        "status": {
-            "privacyStatus": options.privacyStatus,
-            "selfDeclaredMadeForKids": "false",
-        },
+        "status": {"privacyStatus": options.privacyStatus, "selfDeclaredMadeForKids": "false"},
     }
     insert_request = youtube.videos().insert(
-        part=",".join(body.keys()),
-        body=body,
-        media_body=MediaFileUpload(options.file, chunksize=-1, resumable=True),
+        part=",".join(body.keys()), body=body, media_body=MediaFileUpload(options.file, chunksize=-1, resumable=True)
     )
     video_url = resumable_upload(insert_request)
     return video_url
@@ -180,21 +173,16 @@ def upload_video_with_options(
 
 
 def add_video_to_playlist(youtube, videoID, playlist_id):
-    add_video_request = (
-        youtube.playlistItems()
-        .insert(
-            part="snippet",
-            body={
-                "snippet": {
-                    "playlistId": playlist_id,
-                    "resourceId": {"kind": "youtube#video", "videoId": videoID}
-                    # 'position': 0
-                }
-            },
-        )
-        .execute()
-    )
-    return add_video_request
+    youtube.playlistItems().insert(
+        part="snippet",
+        body={
+            "snippet": {
+                "playlistId": playlist_id,
+                "resourceId": {"kind": "youtube#video", "videoId": videoID}
+                # 'position': 0
+            }
+        },
+    ).execute()
 
 
 # function when run directly
@@ -212,10 +200,7 @@ def main():
     )
     parser.add_argument("--keywords", help="Video keywords, comma separated", default="")
     parser.add_argument(
-        "--privacyStatus",
-        choices=VALID_PRIVACY_STATUSES,
-        default="private",
-        help="Video privacy status.",
+        "--privacyStatus", choices=VALID_PRIVACY_STATUSES, default="private", help="Video privacy status."
     )
     args = parser.parse_args()
     youtubedata = get_service()

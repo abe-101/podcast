@@ -1,9 +1,9 @@
 import logging
 
-import config
-import podcast_info
+import podcast.config as config
 
-# from utils import adobe_podcast, audio_conversion, captivate_api, download_yt, spotify, upload_video
+from .utils import adobe_podcast, audio_conversion, captivate_api, download_yt, spotify, upload_video  # NOQA: F401
+from .utils.configuration_manager import ConfigurationManager, LocalMedia, PodcastInfo  # NOQA: F401
 
 # Configure the logger
 logger = logging.getLogger("Podcast")
@@ -28,6 +28,10 @@ logger.addHandler(file_handler)
 logger.addHandler(console_handler)
 
 
+def hello_world():
+    print("Hello World!")
+
+
 def prompt_user_for_playlist():
     playlists = config.playlists
     for i, playlist in enumerate(playlists, start=1):
@@ -35,8 +39,16 @@ def prompt_user_for_playlist():
 
     choice = int(input("Enter the number of the playlist you want to select: "))
     selected_playlist = playlists[choice - 1]
-    podcast = podcast_info.PodcastInfo(selected_playlist)
+    podcast = PodcastInfo(selected_playlist)
     return podcast
+
+
+def youtube_to_captivate(podcast: PodcastInfo, artwork: str = "", publish: bool = True, enhance: bool = False):
+    media: LocalMedia = download_yt.download_youtube_video(podcast.youtube_url)
+    if artwork != "":
+        media.thumbnail = artwork
+    if enhance:
+        media.file_name = adobe_podcast.enhance_audio(media.file_name)
 
 
 def main():

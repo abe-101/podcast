@@ -6,9 +6,10 @@ import os
 import unicodedata
 from http.client import IncompleteRead
 
-from configuration_manager import LocalMedia
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
+
+from .configuration_manager import LocalMedia
 
 
 def clean_video_title(title):

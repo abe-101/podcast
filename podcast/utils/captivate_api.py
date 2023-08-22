@@ -2,8 +2,9 @@ import logging
 from datetime import datetime
 
 import requests
-from audio_conversion import normalize_volume
-from configuration_manager import ConfigurationManager, LocalMedia
+
+from .audio_conversion import normalize_volume
+from .configuration_manager import ConfigurationManager, LocalMedia
 
 
 def format_date(date: datetime) -> str | None:

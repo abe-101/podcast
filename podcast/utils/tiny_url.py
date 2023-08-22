@@ -2,8 +2,9 @@ import json
 from urllib.parse import urlparse
 
 import requests
-from configuration_manager import ConfigurationManager
 from dotenv import load_dotenv
+
+from .configuration_manager import ConfigurationManager
 
 load_dotenv()
 
