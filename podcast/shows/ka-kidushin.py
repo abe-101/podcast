@@ -2,9 +2,9 @@ import os
 
 import requests
 
-from podcast.main import *  # NOQA: F401, F403
+import podcast.main as m
 
-podcast = PodcastInfo(config.playlists[config.KA_KIDDUSHIN])  # NOQA: F405
+podcast = m.PodcastInfo(m.config.playlists[m.config.KA_KIDDUSHIN])  # NOQA: F405
 
 # create_show_short_links(podcast)
 

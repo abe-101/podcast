@@ -80,10 +80,20 @@ if "__main__" == __name__:
     elif choice == "2":
         num_daf = input("Enter the daf number: ")
         file = get_filename(podcast.dir, num_daf)
-        artwork = get_thumbnail_link(num_daf)
-        media: m.LocalMedia = m.file_to_captivate(
-            podcast=podcast, file=file, artwork=artwork, enhance=True
-        )  # NOQA: F405
+        file = m.adobe_podcast.enhance_podcast(file, m.config_manager)
+        title = file.split("/")[-1].split(".")[0]
+        media: m.LocalMedia = m.LocalMedia(file_name=file, title=title, description=title)
+        media.thumbnail = get_thumbnail_link(num_daf)
+        episode = m.captivate_api.publish_podcast(
+            local_media=media, podcast=podcast, config=m.config_manager, episode_num=str(num_daf)
+        )
 
-        # Create YouTube video
-        media.thumbnail = podcast.dir + "/YouTube/00" + num_daf + ".jpg"
+        video_pic = podcast.dir + "/YouTube/00" + num_daf + ".jpg"
+        media.file_name = m.audio_conversion.create_video_from_audio(
+            media.file_name, video_pic, podcast.dir + "/" + title + ".mp4"
+        )
+        youtube_video = m.upload_video.upload_video_with_options(
+            media, privacyStatus="public", playlist_id=podcast.playlist_id, channel_id=podcast.channel_id
+        )
+        media.url = youtube_video
+        print(youtube_video)
