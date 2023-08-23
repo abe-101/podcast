@@ -67,27 +67,33 @@ VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")
 
 
 def get_service():
-    # flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
-    # credentials = flow.run_local_server()
     creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
+
+    # Check if we have a stored token.
     if os.path.exists("token.json"):
         creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            # If you don't have the credentials.json file, create it by following YouTube API documentation.
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+        if creds and creds.expired:
+            if creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                except Exception as e:
+                    print(f"Failed to refresh the token: {e}")
+                    creds = None
+            else:
+                print("No refresh token found. Please reauthenticate.")
+                creds = None
+
+        # If creds are still None at this point, re-authenticate the user.
+        if not creds:
+            flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
             creds = flow.run_local_server(port=0)
 
-        # Save the credentials for the next run
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
-
+            # Save the credentials for the next run
+            with open("token.json", "w") as token:
+                token.write(creds.to_json())
     return build(API_SERVICE_NAME, API_VERSION, credentials=creds)
 
 
@@ -141,8 +147,8 @@ def initialize_upload(youtube, options):
         "status": {"privacyStatus": options.privacyStatus, "selfDeclaredMadeForKids": "false"},
     }
     insert_request = youtube.videos().insert(
-        onBehalfOfContentOwner=options.channel_id[2:],
-        onBehalfOfContentOwnerChannel=options.channel_id,
+        # onBehalfOfContentOwner=options.channel_id[2:],
+        # onBehalfOfContentOwnerChannel=options.channel_id,
         part=",".join(body.keys()),
         body=body,
         media_body=MediaFileUpload(options.file, chunksize=-1, resumable=True),
