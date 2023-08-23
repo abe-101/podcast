@@ -161,3 +161,6 @@ cython_debug/
 token.json
 config.py
 data/
+auth.json
+client_secret.json
+credentials.json

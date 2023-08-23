@@ -44,35 +44,48 @@ The resulting podcasts will be uploaded and published on Captivate.fm with metad
 
 ## Configuration
 
-The project uses a configuration file named `config.json` to store data for multiple playlists/podcasts. The configuration file includes information such as API keys, playlist IDs, directory paths, and URLs. You can modify this file to add, remove, or update playlist data as needed.
+The project uses a configuration file named `config.py` to store data for multiple playlists/podcasts. The configuration file includes information such as API keys, playlist IDs, directory paths, and URLs. You can modify this file to add, remove, or update playlist data as needed.
 
-```json
-{
-  "playlists": [
+```python
+PODCAST_1 = 0
+PODCAST_2 = 1
+
+playlists = [
     {
-      "podcast_show_id": "show_id_1",
-      "spotify_id": "spotify_id_1",
-      "dir": "/path/to/directory1",
-      "apple_url": "apple_url_1",
-      "rss": "rss_url_1",
-      "playlist_id": "youtube_playlist_id_1",
-      "captivate_api_key": "your_captivate_api_key_1",
-      "adobe_ai_api_key": "your_adobe_ai_api_key_1",
-      "tinyurl_api_key": "your_tinyurl_api_key_1"
+        "name": "podcast_1",
+        "podcast_show_id": "<INSERT_CAPTIVATE_FM_SHOW_ID>",
+        "spotify_id": "<INSERT_SHOWS_SPOTIFY_ID>",
+        "dir": "<INSERT_DATA_DIR>",
+        "apple_url": "<INSERT_SHOWS_APPLE_LINK>",
+        "rss": "<INSERT_CAPTIVATE_FM_SHOW_RSS>",
+        "playlist_id": "<INSERT_YOUTUBE_PLAYLIST_ID>",
+        "google_url": "<INSERT_SHOWS_APPLE_LINK>",
+        "channel_id": "<INSERT_YOUTUBE_CHANNEL_ID>",
     },
     {
-      "podcast_show_id": "show_id_2",
-      "spotify_id": "spotify_id_2",
-      "dir": "/path/to/directory2",
-      "apple_url": "apple_url_2",
-      "rss": "rss_url_2",
-      "playlist_id": "youtube_playlist_id_2",
-      "captivate_api_key": "your_captivate_api_key_2",
-      "adobe_ai_api_key": "your_adobe_ai_api_key_2",
-      "tinyurl_api_key": "your_tinyurl_api_key_2"
-    }
-  ]
-}
+        "name": "podcast_2",
+        "podcast_show_id": "<INSERT_CAPTIVATE_FM_SHOW_ID>",
+        "spotify_id": "<INSERT_SHOWS_SPOTIFY_ID>",
+        "dir": "<INSERT_DATA_DIR>",
+        "apple_url": "<INSERT_SHOWS_APPLE_LINK>",
+        "rss": "<INSERT_CAPTIVATE_FM_SHOW_RSS>",
+        "playlist_id": "<INSERT_YOUTUBE_PLAYLIST_ID>",
+        "google_url": "<INSERT_SHOWS_APPLE_LINK>",
+        "channel_id": "<INSERT_YOUTUBE_CHANNEL_ID>",
+    },
+]
+
+YOUTUBE_API_KEY = "<INSERT_YOUTUBE_API_KEY>"
+CAPTIVATE_USER_ID = "<INSERT_CAPTIVATE_FM_USER_ID>"
+CAPTIVATE_API_KEY = "<INSERT_CAPTIVATE_FM_API_KEY>"
+IMGUR_CLIENT_ID = "<INSERT_IMGUR_CLINET_ID>"
+IMGUR_CLIENT_SECRET = "<INSERT_IMGUR_CLINET_SECRET>"
+SPOTIFY_CLIENT_ID = "<INSERT_SPOTIFY_CLIENT_ID>"
+SPOTIFY_CLIENT_SECRET = "<INSERT_SPOTIFY_CLIENT_SECRET>"
+TINYURL_API_KEY = "<INSERT_TINY_URL_API_KEY>"
+PLAYWRIGHT_HEADLESS = 'False'
+
+
 ```
 
 ## Dependencies
