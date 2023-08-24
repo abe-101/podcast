@@ -1,8 +1,7 @@
 import logging
 
 import podcast.config as config
-
-from .utils import (  # NOQA: F401
+from podcast.utils import (  # NOQA: F401
     adobe_podcast,
     audio_conversion,
     captivate_api,
@@ -11,7 +10,7 @@ from .utils import (  # NOQA: F401
     tiny_url,
     upload_video,
 )
-from .utils.configuration_manager import ConfigurationManager, LocalMedia, PodcastInfo  # NOQA: F401
+from podcast.utils.configuration_manager import ConfigurationManager, LocalMedia, PodcastInfo  # NOQA: F401
 
 config_manager = ConfigurationManager()
 
@@ -78,6 +77,10 @@ def prompt_user_for_playlist():
 def main():
     podcast = prompt_user_for_playlist()
     print(f"Selected playlist: {podcast.name}")
+    youtube_id = input("Enter the YouTube ID: ")
+    media: LocalMedia = download_yt.download_youtube_video(youtube_id, podcast.dir)
+    episode = captivate_api.publish_podcast(local_media=media, podcast=podcast, config=config_manager)
+    print(f"Episode: {episode}")
 
     # name = input("Enter the name of the podcast: ")
     # # Get the latest videos from the selected playlist
