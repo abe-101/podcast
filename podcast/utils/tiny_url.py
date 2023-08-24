@@ -1,10 +1,11 @@
 import json
+from enum import Enum
 from urllib.parse import urlparse
 
 import requests
 from dotenv import load_dotenv
 
-from .configuration_manager import ConfigurationManager
+from podcast.utils.configuration_manager import ConfigurationManager
 
 load_dotenv()
 
@@ -19,6 +20,50 @@ def capitalize_url(url):
     )
     capitalized_url = f"{parsed_url.scheme}://{capitalized_domain}{parsed_url.path}"
     return capitalized_url
+
+
+class Operation(Enum):
+    CREATE = "create"
+    UPDATE = "update"
+    CHANGE = "change"
+    DELETE = "delete"
+    ARCHIVE = "archive"
+    UNARCHIVE = "unarchive"
+
+
+class URLData:
+    def __init__(
+        self,
+        operation: Operation,
+        url: str,
+        domain: str,
+        alias: str,
+        tags: list[str] = None,
+        expires_at: str = "",
+        metadata: list[str] = None,
+    ):
+        self.operation = operation
+        self.url = url
+        self.metadata = metadata if metadata else []
+        self.domain = domain
+        self.alias = alias
+        self.tags = tags if tags else []
+        self.expires_at = expires_at
+
+    def to_dict(self) -> dict:
+        data = {
+            "operation": self.operation.value,
+            "url": self.url,
+            "domain": self.domain,
+            "alias": self.alias,
+            "tags": self.tags,
+            "expires_at": self.expires_at,
+        }
+
+        if self.metadata:
+            data["metadata"] = self.metadata
+
+        return data
 
 
 class TinyURLAPI:
@@ -66,33 +111,62 @@ class TinyURLAPI:
         else:
             return self.create_alias_url(long_url, alias, domain, tags, expires_at)
 
+    def bulk_create_short_urls(self, url_data: list[URLData]) -> str:
+        """
+        Bulk creates short URLs.
+
+        Parameters:
+        - url_data (List[URLData]): List containing the long URLs and their details.
+        - bearer_token (str): Token for authentication.
+        - api_url (str): API endpoint. Defaults to "https://api.tinyurl.com/bulk".
+
+        Returns:
+        - Response text from the server.
+        """
+
+        payload = json.dumps({"items": [data.to_dict() for data in url_data]})
+
+        response = requests.request("POST", self.url + "bulk", headers=self.headers, data=payload)
+        return response.json()
+
 
 if "__main__" == __name__:
     # Example usage
     creator = TinyURLAPI(config.TINY_URL_API_KEY)
-    url = creator.get_or_create_alias_url(
-        "https://podcasts.apple.com/us/podcast/meseches-gittin-rabbi-shloime-greenwald/id1689640425",
-        "Gittin-Apple",
-    )
-    print(url)
+    url_data = [
+        URLData(
+            operation=Operation.CREATE,
+            url="https://podcasts.apple.com/us/podcast/meseches-gittin-rabbi-shloime-greenwald/id1689640425",
+            domain="my.shiurim.net",
+            alias="Gittin-Apple-test2",
+        ),
+    ]
+    r = creator.bulk_create_short_urls(url_data)
+    print(r)
 
-    url = creator.get_or_create_alias_url(
-        "https://open.spotify.com/show/0Cgr6r1gTNNzbln8ghofjH",
-        "Gittin-Spotify",
-    )
-    print(url)
-    url = creator.get_or_create_alias_url(
-        "https://podcasts.google.com/feed/aHR0cHM6Ly9mZWVkcy5jYXB0aXZhdGUuZm0vZ2l0dGlu",
-        "Gittin-Google",
-    )
-    print(url)
-    url = creator.get_or_create_alias_url(
-        "https://www.youtube.com/playlist?list=PLFy3gCT2Rdy-umH9TAvs7VnF8peLPXZRo",
-        "Gittin-YouTube",
-    )
-    print(url)
-    url = creator.get_or_create_alias_url(
-        "https://gittin.captivate.fm/listen",
-        "Gittin",
-    )
-    print(url)
+    # url = creator.get_or_create_alias_url(
+    #        "https://podcasts.apple.com/us/podcast/meseches-gittin-rabbi-shloime-greenwald/id1689640425",
+    #        "Gittin-Apple",
+    #        )
+    # print(url)
+
+    # url = creator.get_or_create_alias_url(
+    #        "https://open.spotify.com/show/0Cgr6r1gTNNzbln8ghofjH",
+    #        "Gittin-Spotify",
+    #        )
+    # print(url)
+    # url = creator.get_or_create_alias_url(
+    #        "https://podcasts.google.com/feed/aHR0cHM6Ly9mZWVkcy5jYXB0aXZhdGUuZm0vZ2l0dGlu",
+    #        "Gittin-Google",
+    #        )
+    # print(url)
+    # url = creator.get_or_create_alias_url(
+    #        "https://www.youtube.com/playlist?list=PLFy3gCT2Rdy-umH9TAvs7VnF8peLPXZRo",
+    #        "Gittin-YouTube",
+    #        )
+    # print(url)
+    # url = creator.get_or_create_alias_url(
+    #        "https://gittin.captivate.fm/listen",
+    #        "Gittin",
+    #        )
+    # print(url)
