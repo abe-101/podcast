@@ -54,3 +54,32 @@ def get_latest_spotify_episode_link(episode_name: str, podcast_channel_id: str, 
         count -= 1
         print("waiting 2 minutes to try again")
         time.sleep(120)
+
+
+def get_spotify_episode_links(podcast_channel_id: str, config: ConfigurationManager) -> dict[str, str]:
+    """
+    Retrieve episode links for a given podcast channel using the provided access token.
+
+    :param podcast_channel_id: The ID of the podcast channel to retrieve the links from.
+    :type podcast_channel_id: str
+
+    :param config: The config object with env secrets.
+    :type config: ConfigurationManager
+
+    :return: A dictionary where the keys are episode names and the values are their corresponding Spotify links.
+    :rtype: Dict[str, str]
+    """
+
+    access_token = config.get_spotify_token()
+    episode_links = {}
+
+    url = f"https://api.spotify.com/v1/shows/{podcast_channel_id}/episodes?market=us"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.get(url, headers=headers).json()
+
+    for episode in response["items"]:
+        episode_name = episode["name"]
+        episode_link = episode["external_urls"]["spotify"]
+        episode_links[episode_name] = episode_link
+
+    return episode_links
