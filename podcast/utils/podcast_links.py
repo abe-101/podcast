@@ -1,32 +1,137 @@
+import re
+
 import feedparser
 import requests
 from bs4 import BeautifulSoup
 
-from .configuration_manager import ConfigurationManager
-from .spotify import get_latest_spotify_episode_link
+from podcast.utils.apple import get_apple_episode_links
+from podcast.utils.configuration_manager import ConfigurationManager, PodcastInfo
+from podcast.utils.spotify import get_spotify_episode_links
+from podcast.utils.tiny_url import TinyURLAPI
 
 
 class Links:
-    def __init__(self, apple, spotify):
-        self.youtube = None
-        self.apple = apple
-        self.spotify = spotify
+    def __init__(self, title, podcast: PodcastInfo, config: ConfigurationManager):
+        self.podcast: PodcastInfo = podcast
+        self.config: ConfigurationManager = config
+        self.title = title
+        self.apple = get_apple_episode_links(podcast.apple_id).get(title)
+        self.spotify = get_spotify_episode_links(podcast.spotify_id, config).get(title)
+        self.captivatefm = get_captivatefm_episode_links(podcast.rss).get(title)
+        self.youtube = get_youtube_id_from_podcast(podcast, title)
+
+        self.youtute_short = None
+        self.apple_short = None
+        self.spotify_short = None
+        self.captivatefm_short = None
+
+    def get_tiny_urls(self, short_name: str, tags: str = [""]):
+        create = TinyURLAPI(self.config.TINY_URL_API_KEY)
+        self.youtube_short = create.get_or_create_alias_url(
+            f"https://youtu.be/{self.youtube}",
+            f"{short_name}-YouTube",
+            tags=tags.append("youtube"),
+        )
+        self.spotify_short = create.get_or_create_alias_url(
+            self.spotify,
+            f"{short_name}-Spotify",
+            tags=tags.append("spotify"),
+        )
+        self.apple_short = create.get_or_create_alias_url(
+            self.apple,
+            f"{short_name}-Apple",
+            tags=tags.append("apple"),
+        )
+        self.captivatefm_short = create.get_or_create_alias_url(
+            self.captivatefm,
+            f"{short_name}",
+            tags=tags.append("captivatefm"),
+        )
+
+    def __str__(self):
+        return f"""
+
+YouTube - {self.youtube}
+Spotify - {self.spotify}
+Apple - {self.apple}
+Captivate.fm - {self.captivatefm}
+"""
+
+    def whatsapp_str(self):
+        return f"""
+*{self.title}*
+
+*YouTube*
+
+{self.youtube_short}
+
+*Spotify*
+
+{self.spotify_short}
+
+*Apple*
+
+{self.apple_short}
+
+{self.captivatefm_short}
+"""
 
 
-def get_episode_links(episode_title, show, config: ConfigurationManager):
-    captivate_link = get_captivate_link(show["rss"], episode_title)
-    print(captivate_link)
-    if show["apple_url"] != "":
-        apple_link = get_apple_link(show["apple_url"], episode_title)
+def get_youtube_id_from_podcast(podcast: PodcastInfo, episode_title):
+    rss_url = "https://feeds.captivate.fm/" + podcast.rss
+    feed = feedparser.parse(rss_url)
+    for episode in feed.entries:
+        if episode["title"] == episode_title:
+            return get_youtube_id_from_text(episode["summary"])
+
+
+def get_youtube_id_from_text(text: str):
+    pattern = r"(?:youtube\.com\/watch\?v=|youtu.be\/)([A-Za-z0-9_-]+)"
+    match = re.search(pattern, text)
+    if match:
+        video_id = match.group(1)
+        return video_id
     else:
-        apple_link = None
-    spotify_link = get_latest_spotify_episode_link(episode_title, show["spotify_id"], config)
-
-    return {"apple": apple_link, "spotify": spotify_link}
+        return None
 
 
-def get_youtube_id(youtube_channel, episode_title):
-    pass
+def get_episode_links(episode_title, podcast: PodcastInfo, config: ConfigurationManager):
+    capt = get_captivatefm_episode_links(podcast.rss)
+    spotify = get_spotify_episode_links(podcast.spotify_id, config)
+    apple = get_apple_episode_links(podcast.apple_id)
+    return Links(episode_title, apple.get(episode_title), spotify.get(episode_title), capt.get(episode_title))
+
+    # captivate_link = get_captivate_link(podcast.rss, episode_title)
+    # if show["apple_url"] != "":
+    #    apple_link = get_apple_link(show["apple_url"], episode_title)
+    # else:
+    #    apple_link = None
+    # spotify_link = get_latest_spotify_episode_link(episode_title, show["spotify_id"], config)
+
+    # return {"apple": apple_link, "spotify": spotify_link}
+
+
+def get_captivatefm_episode_links(rss: str) -> dict[str, str]:
+    """
+    Fetches the podcast episode names and their URLs from Captivate.fm based on the given RSS URL.
+
+    Parameters:
+    - rss_url (str): The RSS URL of the podcast.
+
+    Returns:
+    - Dict[str, str]: A dictionary where the key is the episode's name and the value is its link.
+    """
+    rss_url = "https://feeds.captivate.fm/" + rss
+    feed = feedparser.parse(rss_url)
+
+    episodes = {}
+
+    for episode in feed.entries:
+        title = episode["title"]
+        link = episode["links"][0]["href"]
+        episodes[title] = link
+
+    return episodes
 
 
 def get_captivate_link(rss, episode_title):

@@ -17,6 +17,7 @@ class PodcastInfo:
         self.playlist_id: str = data.get("playlist_id", "")
         self.google_url: str | None = data.get("google_url", None)
         self.channel_id: str | None = data.get("channel_id", None)
+        self.apple_id: str | None = self.apple_url[-10:] if self.apple_url else None
 
 
 class LocalMedia:

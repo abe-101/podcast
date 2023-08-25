@@ -1,7 +1,7 @@
 import requests
 
 
-def get_apple_podcast_urls(apple_id: str) -> dict[str, str]:
+def get_apple_episode_links(apple_id: str) -> dict[str, str]:
     """
     Fetches the podcast episode names and their URLs from Apple Podcasts based on the given Apple ID.
 
