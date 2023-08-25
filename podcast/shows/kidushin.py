@@ -43,7 +43,7 @@ def number_to_hebrew(num):
 
 def get_title(daf_number):
     hebrew_daf = number_to_hebrew(daf_number)
-    title = f"Kidushin Daf {daf_number} - מסכת קידושין דף {hebrew_daf} - Rabbi S Greenwald.mp3"
+    title = f"Kidushin Daf {daf_number} - מסכת קידושין דף {hebrew_daf} - Rabbi S Greenwald"
     return title
 
 
