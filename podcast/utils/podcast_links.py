@@ -25,27 +25,35 @@ class Links:
         self.spotify_short = None
         self.captivatefm_short = None
 
-    def get_tiny_urls(self, short_name: str, tags: str = [""]):
+    def get_tiny_urls(self, short_name: str, tags):
         create = TinyURLAPI(self.config.TINY_URL_API_KEY)
+        youtube_tag = tags.copy()
+        youtube_tag.append("youtube")
         self.youtube_short = create.get_or_create_alias_url(
             f"https://youtu.be/{self.youtube}",
             f"{short_name}-YouTube",
-            tags=tags.append("youtube"),
+            tags=youtube_tag,
         )
+        spotify_tag = tags.copy()
+        spotify_tag.append("spotify")
         self.spotify_short = create.get_or_create_alias_url(
             self.spotify,
             f"{short_name}-Spotify",
-            tags=tags.append("spotify"),
+            tags=spotify_tag,
         )
+        apple_tag = tags.copy()
+        apple_tag.append("apple")
         self.apple_short = create.get_or_create_alias_url(
             self.apple,
             f"{short_name}-Apple",
-            tags=tags.append("apple"),
+            tags=apple_tag,
         )
+        captivatefm_tag = tags.copy()
+        captivatefm_tag.append("captivatefm")
         self.captivatefm_short = create.get_or_create_alias_url(
             self.captivatefm,
             f"{short_name}",
-            tags=tags.append("captivatefm"),
+            tags=captivatefm_tag,
         )
 
     def __str__(self):
@@ -93,6 +101,18 @@ def get_youtube_id_from_text(text: str):
         return video_id
     else:
         return None
+
+
+def choose_episode(podcast: PodcastInfo):
+    rss_url = "https://feeds.captivate.fm/" + podcast.rss
+    feed = feedparser.parse(rss_url)
+    episodes = []
+    for episode in feed.entries[:5]:
+        episodes.append(episode["title"])
+    for i, episode in enumerate(episodes):
+        print(f"{i + 1}. {episode}")
+    choice = int(input("Choose an episode: "))
+    return episodes[choice - 1]
 
 
 def get_episode_links(episode_title, podcast: PodcastInfo, config: ConfigurationManager):

@@ -31,10 +31,10 @@ if "__main__" == __name__:
         torah_title = feedparser.parse("https://feeds.captivate.fm/" + torah.rss).entries[0].title
 
         maamor_links = m.podcast_links.Links(maamor_title, mammorim, m.config_manager)
-        maamor_links.get_tiny_urls(MAMMOR_SHORT)
+        maamor_links.get_tiny_urls(MAMMOR_SHORT, ["maamor"])
 
         torah_links = m.podcast_links.Links(torah_title, torah, m.config_manager)
-        torah_links.get_tiny_urls(TORAH_SHORT)
+        torah_links.get_tiny_urls(TORAH_SHORT, ["torah"])
 
         print(maamor_links.whatsapp_str())
         print(torah_links.whatsapp_str())
