@@ -93,6 +93,7 @@ if "__main__" == __name__:
             media, privacyStatus="public", playlist_id=podcast.playlist_id, channel_id=podcast.channel_id
         )
         media.url = youtube_video
+        m.captivate_api.add_youtute_id_to_podcast(podcast, m.config_manager, media)
         print(youtube_video)
 
     elif choice == "3":
@@ -100,4 +101,21 @@ if "__main__" == __name__:
         num_daf = "".join([char for char in title if char.isdigit()])
         links: m.podcast_links.Links = m.podcast_links.Links(title, podcast, m.config_manager)
         links.get_tiny_urls(f"kidushin-{num_daf}", ["shloime-greenwald", "kidushin"])
-        print(links.whatsapp_str())
+        msg = f"""
+*{links.title[:-20]}*
+By Rabbi Shloimy Greenwald
+
+*YouTube Link*
+
+{links.youtube_short}
+
+*Spotify Link*
+
+{links.spotify_short}
+
+*Apple Link*
+
+{links.apple_short}
+"""
+        print(msg)
+        print(links)

@@ -36,6 +36,7 @@ class LocalMedia:
         self.url = url
         self.thumbnail = thumbnail
         self.upload_date = upload_date
+        self.captivate_id = None
 
     def __str__(self):
         return (

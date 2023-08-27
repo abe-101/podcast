@@ -131,6 +131,27 @@ def get_episode_links(episode_title, podcast: PodcastInfo, config: Configuration
     # return {"apple": apple_link, "spotify": spotify_link}
 
 
+def check_for_existing_episode_by_title(title: str, rss: str) -> bool:
+    """
+    Checks if an episode with the given title already exists in the podcast's RSS feed.
+
+    Parameters:
+    - title (str): The title of the episode.
+    - rss (str): The RSS URL of the podcast.
+
+    Returns:
+    - bool: episode_id if the episode exists, False otherwise.
+    """
+    rss_url = "https://feeds.captivate.fm/" + rss
+    feed = feedparser.parse(rss_url)
+
+    for episode in feed.entries:
+        if episode["title"] == title:
+            return episode["id"]
+
+    return False
+
+
 def get_captivatefm_episode_links(rss: str) -> dict[str, str]:
     """
     Fetches the podcast episode names and their URLs from Captivate.fm based on the given RSS URL.
@@ -188,14 +209,6 @@ def get_apple_link(podcast_url, episode_title):
             return href
 
     # Return None if no match found
-    return None
-
-
-def get_anchor_link(rss_url, episode_title):
-    feed = feedparser.parse(rss_url)
-    for episode in feed.entries:
-        if episode["title"] == episode_title:
-            return episode["links"][0]["href"]
     return None
 
 

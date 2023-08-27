@@ -5,6 +5,7 @@ import requests
 
 from .audio_conversion import normalize_volume
 from .configuration_manager import ConfigurationManager, LocalMedia, PodcastInfo
+from .podcast_links import check_for_existing_episode_by_title
 
 
 def format_date(date: datetime) -> str | None:
@@ -220,7 +221,7 @@ def publish_podcast(
     episode_num: str = "1",
     logger: logging.Logger = logging.getLogger(__name__),
     publish: bool = True,
-) -> str:
+) -> LocalMedia:
     """
     Publishes an audio file as a new podcast episode on CaptivateFM.
 
@@ -236,13 +237,18 @@ def publish_podcast(
     Raises:
         ValueError: If any required keys are missing from the info or show dictionaries.
     """
+    episode_id = check_for_existing_episode_by_title(local_media.title, podcast.rss)
+    if episode_id:
+        local_media.captivate_id = episode_id
+        print(f"Episode {local_media.title} already exists on Captivate.fm")
+        return local_media
     formatted_upload_date = format_date(local_media.upload_date)
     show_id = podcast.podcast_show_id
     media_id = upload_media(config=config, show_id=show_id, file_name=local_media.file_name)
 
     video_id = local_media.url[-11:]
     short_youtube_url = "youtu.be/" + video_id
-    youtube = "\nWatch on YouTube: <a href='" + local_media.url + "'>" + short_youtube_url + "</a>\n"
+    youtube = "\nWatch on YouTube: <a href='" + short_youtube_url + "'>" + short_youtube_url + "</a>\n"
     brought_by = """
 \nBrought to you by: <b><a href='https://www.shiurim.net/'>Shiurim.net</a></b>
 Contact us for all your podcast needs: <a href='mailto:podcast@shiurim.net'>podcast@shiurim.net</a>\n
@@ -262,4 +268,29 @@ Contact us for all your podcast needs: <a href='mailto:podcast@shiurim.net'>podc
         episode_art=local_media.thumbnail,
         status="Publish" if publish else "Draft",
     )
-    return episode_id
+    local_media.captivate_id = episode_id
+    return local_media
+
+
+def add_youtute_id_to_podcast(podcast: PodcastInfo, config: ConfigurationManager, media: LocalMedia):
+    episode = get_episode(config, media.captivate_id)
+    shownotes = episode["shownotes"]
+    video_id = media.url[-11:]
+    short_youtube_url = "youtu.be/" + video_id
+    youtube = "\nWatch on YouTube: <a href='" + short_youtube_url + "'>" + short_youtube_url + "</a>\n"
+    shownotes = shownotes.replace(
+        "Brought to you by: <b><a href='https://www.shiurim.net/'>Shiurim.net</a></b>",
+        youtube + "\nBrought to you by: <b><a href='https://www.shiurim.net/'>Shiurim.net</a></b>",
+    )
+    update_podcast(
+        config=config,
+        media_id=episode["media_id"],
+        shows_id=episode["shows_id"],
+        episode_id=media.captivate_id,
+        shownotes=shownotes,
+        title=episode["title"],
+        date=episode["published_date"],
+        status=episode["status"],
+        episode_season=episode["episode_season"],
+        episode_number=episode["episode_number"],
+    )
