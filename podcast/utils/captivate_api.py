@@ -135,7 +135,7 @@ def create_podcast(
         r = response.json()
         episode_id = r["record"]["id"]
 
-        return f"https://player.captivate.fm/episode/{episode_id}"
+        return episode_id
     except requests.exceptions.HTTPError as error:
         print(f"An HTTP error occurred: {error}")
         return None
