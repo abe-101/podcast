@@ -42,25 +42,27 @@ def hello_world():
     print("Hello World!")
 
 
-def create_show_short_links(postcast: PodcastInfo):
+def create_show_short_links(podcast: PodcastInfo, podcast_name: str = None):
     """
     Create tinyurl on the my.shiurimm.net domain for the
     podcast on various platforms like apple, google, spotify, YouTube.
     """
+    if podcast_name is None:
+        podcast_name = podcast.name
     creator: tiny_url.TinyURLAPI = tiny_url.TinyURLAPI(config.TINYURL_API_KEY)
-    print(f"Apple: {postcast.apple_url}")
-    apple_url = creator.get_or_create_alias_url(postcast.apple_url, postcast.name + "-Apple")
+    print(f"Apple: {podcast.apple_url}")
+    apple_url = creator.get_or_create_alias_url(podcast.apple_url, podcast_name + "-Apple")
     print(f"Apple: {apple_url}")
 
-    # google_url = creator.get_or_create_alias_url(postcast.google_url, postcast.name + "-Google")
+    # google_url = creator.get_or_create_alias_url(podcast.google_url, podcast.name + "-Google")
     # print(f"Google: {google_url}")
 
-    spotify_long_url = "https://open.spotify.com/show/" + postcast.spotify_id
-    spotify_url = creator.get_or_create_alias_url(spotify_long_url, postcast.name + "-Spotify")
+    spotify_long_url = "https://open.spotify.com/show/" + podcast.spotify_id
+    spotify_url = creator.get_or_create_alias_url(spotify_long_url, podcast_name + "-Spotify")
     print(f"Spotify: {spotify_url}")
 
-    youtube_long_url = "https://www.youtube.com/playlist?list=" + postcast.playlist_id
-    youtube_url = creator.get_or_create_alias_url(youtube_long_url, postcast.name + "-YouTube")
+    youtube_long_url = "https://www.youtube.com/playlist?list=" + podcast.playlist_id
+    youtube_url = creator.get_or_create_alias_url(youtube_long_url, podcast_name + "-YouTube")
     print(f"YouTube: {youtube_url}")
 
 
@@ -78,10 +80,15 @@ def prompt_user_for_playlist():
 def main():
     podcast = prompt_user_for_playlist()
     print(f"Selected playlist: {podcast.name}")
-    youtube_id = input("Enter the YouTube ID: ")
-    media: LocalMedia = download_yt.download_youtube_video(youtube_id, podcast.dir)
-    episode = captivate_api.publish_podcast(local_media=media, podcast=podcast, config=config_manager)
-    print(f"Episode: {episode}")
+    choice = input("1. YouTube to Captivate.fm, 2. Get show short links: ")
+    if choice == "1":
+        youtube_id = input("Enter the YouTube ID: ")
+        media: LocalMedia = download_yt.download_youtube_video(youtube_id, podcast.dir)
+        episode = captivate_api.publish_podcast(local_media=media, podcast=podcast, config=config_manager)
+        print(f"Episode: {episode}")
+    elif choice == "2":
+        podcast_name = input("Enter the short name of the podcast: ")
+        create_show_short_links(podcast, podcast_name)
 
     # name = input("Enter the name of the podcast: ")
     # # Get the latest videos from the selected playlist

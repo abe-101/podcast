@@ -5,7 +5,7 @@ import requests
 
 from .audio_conversion import normalize_volume
 from .configuration_manager import ConfigurationManager, LocalMedia, PodcastInfo
-from .podcast_links import check_for_existing_episode_by_title
+from .podcast_links import check_for_existing_episode_by_title, get_recent_episode_number
 
 
 def format_date(date: datetime) -> str | None:
@@ -218,7 +218,7 @@ def publish_podcast(
     podcast: PodcastInfo,
     # show: dict[str, str],
     config: ConfigurationManager,
-    episode_num: str = "1",
+    episode_num: str = "",
     logger: logging.Logger = logging.getLogger(__name__),
     publish: bool = True,
 ) -> LocalMedia:
@@ -242,6 +242,8 @@ def publish_podcast(
         local_media.captivate_id = episode_id
         print(f"Episode {local_media.title} already exists on Captivate.fm")
         return local_media
+    if episode_num == "":
+        episode_num = get_recent_episode_number(podcast) + 1
     formatted_upload_date = format_date(local_media.upload_date)
     show_id = podcast.podcast_show_id
     media_id = upload_media(config=config, show_id=show_id, file_name=local_media.file_name)
@@ -282,6 +284,8 @@ def add_youtute_id_to_podcast(podcast: PodcastInfo, config: ConfigurationManager
         "Brought to you by: <b><a href='https://www.shiurim.net/'>Shiurim.net</a></b>",
         youtube + "\nBrought to you by: <b><a href='https://www.shiurim.net/'>Shiurim.net</a></b>",
     )
+    print(f"*~* Updating {media.title} on captivate.fm")
+    print(f"*~* {shownotes}")
     update_podcast(
         config=config,
         media_id=episode["media_id"],

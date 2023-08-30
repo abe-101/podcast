@@ -16,6 +16,8 @@ class Links:
         self.config: ConfigurationManager = config
         self.title = title
         self.apple = get_apple_episode_links(podcast.apple_id).get(title)
+        if not self.apple:
+            self.apple = get_apple_link(podcast.apple_url, title)
         self.spotify = get_spotify_episode_links(podcast.spotify_id, config).get(title)
         self.captivatefm = get_captivatefm_episode_links(podcast.rss).get(title)
         self.youtube = get_youtube_id_from_podcast(podcast, title)
@@ -69,15 +71,15 @@ Captivate.fm - {self.captivatefm}
         return f"""
 *{self.title}*
 
-*YouTube*
+*YouTube Link*
 
 {self.youtube_short}
 
-*Spotify*
+*Spotify Link*
 
 {self.spotify_short}
 
-*Apple*
+*Apple Link*
 
 {self.apple_short}
 
@@ -121,15 +123,6 @@ def get_episode_links(episode_title, podcast: PodcastInfo, config: Configuration
     apple = get_apple_episode_links(podcast.apple_id)
     return Links(episode_title, apple.get(episode_title), spotify.get(episode_title), capt.get(episode_title))
 
-    # captivate_link = get_captivate_link(podcast.rss, episode_title)
-    # if show["apple_url"] != "":
-    #    apple_link = get_apple_link(show["apple_url"], episode_title)
-    # else:
-    #    apple_link = None
-    # spotify_link = get_latest_spotify_episode_link(episode_title, show["spotify_id"], config)
-
-    # return {"apple": apple_link, "spotify": spotify_link}
-
 
 def check_for_existing_episode_by_title(title: str, rss: str) -> bool:
     """
@@ -150,6 +143,12 @@ def check_for_existing_episode_by_title(title: str, rss: str) -> bool:
             return episode["id"]
 
     return False
+
+
+def get_recent_episode_number(podcast: PodcastInfo):
+    rss_url = "https://feeds.captivate.fm/" + podcast.rss
+    feed = feedparser.parse(rss_url)
+    return int(feed.entries[0]["podcast_episode"])
 
 
 def get_captivatefm_episode_links(rss: str) -> dict[str, str]:
@@ -210,14 +209,3 @@ def get_apple_link(podcast_url, episode_title):
 
     # Return None if no match found
     return None
-
-
-def prepare_sharable_post(links: dict, youtube_id: str, video_title: str):
-    template = f"""
-{video_title}
-
-YouTube - https://www.youtube.com/watch?v={youtube_id}
-Spotify - {links["spotify"]}
-Apple - {links["apple"]}
-"""
-    return template
