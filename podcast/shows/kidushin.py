@@ -76,7 +76,6 @@ if "__main__" == __name__:
     elif choice == "2":
         num_daf = input("Enter the daf number: ")
         file = podcast.dir + "/" + num_daf + ".mp3"
-        # title = file.split("/")[-1].split(".")[0]
         title = get_title(int(num_daf))
         file = m.adobe_podcast.enhance_podcast(file, m.config_manager)
         media: m.LocalMedia = m.LocalMedia(file_name=file, title=title, description=title)
@@ -89,12 +88,11 @@ if "__main__" == __name__:
         media.file_name = m.audio_conversion.create_video_from_audio_and_picture(
             media.file_name, video_pic, podcast.dir + "/" + title + ".mp4"
         )
-        youtube_video = m.upload_video.upload_video_with_options(
+        media: m.LocalMedia = m.upload_video.upload_video_with_options(
             media, privacyStatus="public", playlist_id=podcast.playlist_id, channel_id=podcast.channel_id
         )
-        media.url = youtube_video
         m.captivate_api.add_youtute_id_to_podcast(podcast, m.config_manager, media)
-        print(youtube_video)
+        print(media.url)
 
     elif choice == "3":
         title = m.podcast_links.choose_episode(podcast)
