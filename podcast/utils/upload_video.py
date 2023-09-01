@@ -182,7 +182,7 @@ def upload_video_with_options(
     video_url = "https://www.youtube.com/watch?v=%s" % video_id
     print(video_url)
     add_video_to_playlist(youtubedata, video_id, playlist_id)
-    localMedia.video_url = video_url
+    localMedia.url = video_url
 
     return localMedia
 
