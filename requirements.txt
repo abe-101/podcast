@@ -32,3 +32,4 @@ truststore==0.7.0
 urllib3_secure_extra==0.1.0
 xmlrpclib==1.0.1
 yt_dlp==2023.7.6
+discord

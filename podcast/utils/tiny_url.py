@@ -66,6 +66,10 @@ class URLData:
         return data
 
 
+class CreateAliasUrlError(Exception):
+    pass
+
+
 class TinyURLAPI:
     def __init__(self, api_token):
         self.api_token = api_token
@@ -77,20 +81,30 @@ class TinyURLAPI:
         }
 
     def create_alias_url(self, long_url, alias, domain="my.shiurim.net", tags="", expires_at=""):
-        if tags == "":
-            tags = []
-        payload = json.dumps(
-            {
-                "url": long_url,
-                "domain": domain,
-                "alias": alias,
-                "tags": tags,
-                "expires_at": expires_at,
-            }
-        )
+        try:
+            if tags == "":
+                tags = []
+            payload = json.dumps(
+                {
+                    "url": long_url,
+                    "domain": domain,
+                    "alias": alias,
+                    "tags": tags,
+                    "expires_at": expires_at,
+                }
+            )
 
-        response = requests.request("POST", self.url + "create", headers=self.headers, data=payload)
-        return capitalize_url(response.json()["data"]["tiny_url"])
+            response = requests.request("POST", self.url + "create", headers=self.headers, data=payload)
+            response_data = response.json()
+
+            if response.status_code != 200 or "data" not in response_data or "tiny_url" not in response_data["data"]:
+                error_message = response_data.get("error", "Unknown error")
+                raise CreateAliasUrlError(error_message)
+
+            return capitalize_url(response_data["data"]["tiny_url"])
+        except CreateAliasUrlError as e:
+            print("An error occurred:", e)
+            raise e
 
     def get_alias_url(self, alias, domain="my.shiurim.net"):
         response = requests.request("GET", self.url + f"alias/{domain}/{alias}", headers=self.headers)

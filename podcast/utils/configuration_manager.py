@@ -81,6 +81,7 @@ class ConfigurationManager:
         self.SPOTIFY_TOKEN = None
         self.YOUTUBE_API = config.YOUTUBE_API_KEY
         self.TINY_URL_API_KEY = config.TINYURL_API_KEY
+        self.DISCORD_WEBHOOK_URL = config.DISCORD_WEBHOOK_URL
 
     def get_captivate_token(self):
         if self.CAPTIVATE_TOKEN is None:

@@ -3,8 +3,9 @@ import re
 import feedparser
 import requests
 from bs4 import BeautifulSoup
+from discord import SyncWebhook
 
-from podcast.utils.apple import get_apple_episode_links
+from podcast.utils.apple import get_shows_apple_episode_links
 from podcast.utils.configuration_manager import ConfigurationManager, PodcastInfo
 from podcast.utils.spotify import get_spotify_episode_links
 from podcast.utils.tiny_url import TinyURLAPI
@@ -15,7 +16,7 @@ class Links:
         self.podcast: PodcastInfo = podcast
         self.config: ConfigurationManager = config
         self.title = title
-        self.apple = get_apple_episode_links(podcast.apple_id).get(title)
+        self.apple = get_shows_apple_episode_links(podcast.apple_id).get(title)
         if not self.apple:
             self.apple = get_apple_link(podcast.apple_url, title)
         self.spotify = get_spotify_episode_links(podcast.spotify_id, config).get(title)
@@ -86,6 +87,43 @@ Captivate.fm - {self.captivatefm}
 {self.captivatefm_short}
 """
 
+    def default_template(self) -> str:
+        """Returns the default template for WhatsApp."""
+        return """
+*{title}*
+
+*YouTube Link*
+{youtube}
+
+*Spotify Link*
+{spotify}
+
+*Apple Link*
+{apple}
+
+{captivatefm}
+"""
+
+    def generate_template(self, template: str = None) -> str:
+        """Generates a string based on the provided template or the default template if none is given."""
+
+        if template is None:
+            template = self.default_template()
+
+        # Replace placeholders with actual values
+        output = template.replace("{title}", self.title)
+        output = output.replace("{youtube}", self.youtube_short)
+        output = output.replace("{spotify}", self.spotify_short)
+        output = output.replace("{apple}", self.apple_short)
+        if "{captivatefm}" in template and self.captivatefm:
+            output = output.replace("{captivatefm}", self.captivatefm_short)
+
+        webhook = SyncWebhook.from_url(self.config.DISCORD_WEBHOOK_URL)
+        output = output.strip()
+        webhook.send(output)
+
+        return output
+
 
 def get_youtube_id_from_podcast(podcast: PodcastInfo, episode_title):
     rss_url = "https://feeds.captivate.fm/" + podcast.rss
@@ -120,7 +158,7 @@ def choose_episode(podcast: PodcastInfo):
 def get_episode_links(episode_title, podcast: PodcastInfo, config: ConfigurationManager):
     capt = get_captivatefm_episode_links(podcast.rss)
     spotify = get_spotify_episode_links(podcast.spotify_id, config)
-    apple = get_apple_episode_links(podcast.apple_id)
+    apple = get_shows_apple_episode_links(podcast.apple_id)
     return Links(episode_title, apple.get(episode_title), spotify.get(episode_title), capt.get(episode_title))
 
 
@@ -194,6 +232,8 @@ def get_apple_link(podcast_url, episode_title):
     Returns:
         str: The episode URL that matches the given title, or None if no match found.
     """
+    if podcast_url == "":
+        return None
     # Send an HTTP GET request to the podcast URL
     response = requests.get(podcast_url)
 
