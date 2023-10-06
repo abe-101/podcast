@@ -9,6 +9,7 @@ from podcast import config
 class PodcastInfo:
     def __init__(self, data: dict):
         self.name: str = data.get("name", "")
+        self.author: str = data.get("author", "")
         self.podcast_show_id: str = data.get("podcast_show_id", "")
         self.spotify_id: str = data.get("spotify_id", "")
         self.dir: str = data.get("dir", "")
@@ -82,6 +83,9 @@ class ConfigurationManager:
         self.YOUTUBE_API = config.YOUTUBE_API_KEY
         self.TINY_URL_API_KEY = config.TINYURL_API_KEY
         self.DISCORD_WEBHOOK_URL = config.DISCORD_WEBHOOK_URL
+        self.WHATSAPP_TOKEN = config.WHATSAPP_TOKEN
+        self.WHATSAPP_BUISNESS_ID = config.WHATSAPP_BUISNESS_ID
+        self.WHATSAPP_SENDER_ID = config.WHATSAPP_SENDER_ID
 
     def get_captivate_token(self):
         if self.CAPTIVATE_TOKEN is None:

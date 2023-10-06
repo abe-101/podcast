@@ -19,6 +19,29 @@ def normalize_volume(file_path: str, target_dBFS: float = -15.0) -> str:
     return file_path
 
 
+def convert_m4a_to_mp3(file_name: str) -> None | str:
+    """
+    Convert a given .m4a file to .mp3 format.
+
+    Args:
+    - file_name (str): The name of the file to be converted.
+
+    Returns:
+    - str: The name of the converted file if the input file was m4a.
+    - None: If the input file wasn't an m4a file.
+    """
+
+    if file_name.lower().endswith(".m4a"):
+        audio = AudioSegment.from_file(file_name, "m4a")
+
+        mp3_file_name = file_name.rsplit(".", 1)[0] + ".mp3"
+        audio.export(mp3_file_name, format="mp3")
+
+        return mp3_file_name
+
+    return None
+
+
 def create_video_from_audio_and_picture(audio_path: str, image_path: str, output_path: str) -> str:
     """Create and save a video file to `output_path` after
     combining a static image that is located in `image_path`
@@ -76,6 +99,24 @@ def combine_mp3_files(file1: str, file2: str) -> str:
     """
     sound1 = AudioSegment.from_mp3(file1)
     sound2 = AudioSegment.from_mp3(file2)
+    combined = sound1 + sound2
+    new = file1.rsplit(".", 1)[0] + " (combined).mp3"
+    combined.export(new, format="mp3")
+    return new
+
+
+def combine_m4a_files(file1: str, file2: str) -> str:
+    """Combine two m4a files into one.
+
+    :param file1: The path to the first m4a file.
+    :type file1: str
+    :param file2: The path to the second m4a file.
+    :type file2: str
+    :return: The combined audio.
+    :rtype: AudioSegment
+    """
+    sound1 = AudioSegment.from_file(file1, format="m4a")
+    sound2 = AudioSegment.from_file(file2, format="m4a")
     combined = sound1 + sound2
     new = file1.rsplit(".", 1)[0] + " (combined).mp3"
     combined.export(new, format="mp3")

@@ -130,19 +130,22 @@ def get_all_videos_from_playlist(youtube, playlist_id):
 
 podcast = m.PodcastInfo(m.config.playlists[m.config.SIMON])
 
+SHORT_NAME = "Soul-of-Yom-Kippur"
+YOU_TUBE_ID = "x57R3pkUigM"
+
 if "__main__" == __name__:
     choice = input("1 - convert YouTube video, 2 - get links: ")
     if choice == "1":
-        url = input("Enter a YouTube URL: ")
+        url = YOU_TUBE_ID
         media: m.LocalMedia = m.download_yt.download_youtube_video(url, podcast.dir)
         episode = m.captivate_api.publish_podcast(local_media=media, podcast=podcast, config=m.config_manager)
 
     if choice == "2":
-        title = m.podcast_links.choose_episode(podcast)
-        short_name = input("Enter a short name: ")
-        links: m.podcast_links.Links = m.podcast_links.Links(title, podcast, m.config_manager)
-        links.get_tiny_urls(short_name, ["simon"])
-        print(links.whatsapp_str())
+        title = feedparser.parse("https://feeds.captivate.fm/" + podcast.rss).entries[0].title
+        short_name = SHORT_NAME
+        links: m.podcast_links.Links = m.podcast_links.Links(title, short_name, podcast, m.config_manager)
+        links.get_tiny_urls(["simon"])
+        links.send_whatsapp_msg()
 
     if choice == "3":
         youtube = get_new_videos(podcast)

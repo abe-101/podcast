@@ -77,6 +77,28 @@ def prompt_user_for_playlist():
     return podcast
 
 
+def add_audio_to_podcast(podcast: PodcastInfo, file_1: str, file_2: str, episode_id: str, format: str = "mp3"):
+    if format == "m4a":
+        combined_file = audio_conversion.combine_m4a_files(file_1, file_2)
+    else:
+        combined_file = audio_conversion.combine_mp3_files(file_1, file_2)
+    media_id = captivate_api.upload_media(config_manager, podcast.podcast_show_id, combined_file)
+    episode = captivate_api.get_episode(config_manager, episode_id)
+    episode_url = captivate_api.update_podcast(
+        config=config_manager,
+        media_id=media_id,
+        shows_id=podcast.podcast_show_id,
+        episode_id=episode_id,
+        shownotes=episode["shownotes"],
+        title=episode["title"],
+        date=episode["published_date"],
+        status=episode["status"],
+        episode_number=episode["episode_number"],
+        episode_season=episode["episode_season"],
+    )
+    print(f"Episode URL: {episode_url}")
+
+
 def main():
     podcast = prompt_user_for_playlist()
     print(f"Selected playlist: {podcast.name}")

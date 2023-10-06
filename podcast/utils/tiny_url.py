@@ -117,8 +117,8 @@ class TinyURLAPI:
     def get_or_create_alias_url(self, long_url, alias, domain="my.shiurim.net", tags="", expires_at=""):
         if tags == "":
             tags = []
-        if long_url is None:
-            return None
+        if long_url is None or long_url == "":
+            return ""
         existing_url = self.get_alias_url(alias, domain)
         if existing_url:
             return existing_url

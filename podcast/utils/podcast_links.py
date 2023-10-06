@@ -9,13 +9,16 @@ from podcast.utils.apple import get_shows_apple_episode_links
 from podcast.utils.configuration_manager import ConfigurationManager, PodcastInfo
 from podcast.utils.spotify import get_spotify_episode_links
 from podcast.utils.tiny_url import TinyURLAPI
+from podcast.utils.whatsapp import send_whatsapp_message
 
 
 class Links:
-    def __init__(self, title, podcast: PodcastInfo, config: ConfigurationManager):
+    def __init__(self, title, short_name, podcast: PodcastInfo, config: ConfigurationManager):
         self.podcast: PodcastInfo = podcast
         self.config: ConfigurationManager = config
         self.title = title
+        self.short_name = short_name
+        self.author = podcast.author
         self.apple = get_shows_apple_episode_links(podcast.apple_id).get(title)
         if not self.apple:
             self.apple = get_apple_link(podcast.apple_url, title)
@@ -24,11 +27,12 @@ class Links:
         self.youtube = get_youtube_id_from_podcast(podcast, title)
 
         self.youtute_short = None
-        self.apple_short = None
+        self.apple_short = ""
         self.spotify_short = None
         self.captivatefm_short = None
 
-    def get_tiny_urls(self, short_name: str, tags):
+    def get_tiny_urls(self, tags):
+        short_name = self.short_name
         create = TinyURLAPI(self.config.TINY_URL_API_KEY)
         youtube_tag = tags.copy()
         youtube_tag.append("youtube")
@@ -124,6 +128,9 @@ Captivate.fm - {self.captivatefm}
 
         return output
 
+    def send_whatsapp_msg(self):
+        send_whatsapp_message(self.title, self.author, self.short_name, self.config)
+
 
 def get_youtube_id_from_podcast(podcast: PodcastInfo, episode_title):
     rss_url = "https://feeds.captivate.fm/" + podcast.rss
@@ -186,6 +193,8 @@ def check_for_existing_episode_by_title(title: str, rss: str) -> bool:
 def get_recent_episode_number(podcast: PodcastInfo):
     rss_url = "https://feeds.captivate.fm/" + podcast.rss
     feed = feedparser.parse(rss_url)
+    if not feed.entries:  # Check if the entries list is empty
+        return 1
     return int(feed.entries[0]["podcast_episode"])
 
 
@@ -248,4 +257,4 @@ def get_apple_link(podcast_url, episode_title):
             return href
 
     # Return None if no match found
-    return None
+    return ""

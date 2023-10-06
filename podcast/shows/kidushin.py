@@ -1,3 +1,6 @@
+import time
+
+import feedparser
 from imgurpython import ImgurClient
 
 import podcast.main as m
@@ -75,8 +78,13 @@ if "__main__" == __name__:
 
     elif choice == "2":
         num_daf = input("Enter the daf number: ")
-        file = podcast.dir + "/" + num_daf + ".mp3"
+        file = podcast.dir + "/" + num_daf + ".m4a"
+        print(file)
         title = get_title(int(num_daf))
+        was_m4a = m.audio_conversion.convert_m4a_to_mp3(file)
+        print(was_m4a)
+        if was_m4a:
+            file = was_m4a
         file = m.adobe_podcast.enhance_podcast(file, m.config_manager)
         media: m.LocalMedia = m.LocalMedia(file_name=file, title=title, description=title)
         media.thumbnail = get_thumbnail_link(num_daf)
@@ -92,28 +100,22 @@ if "__main__" == __name__:
             media, privacyStatus="public", playlist_id=podcast.playlist_id, channel_id=podcast.channel_id
         )
         m.captivate_api.add_youtute_id_to_podcast(podcast, m.config_manager, media)
-        print(media.url)
+
+        print("Starting to wait...")
+        time.sleep(15 * 60)  # 15 minutes in seconds
+        print("Done waiting!")
+
+        title = feedparser.parse("https://feeds.captivate.fm/" + podcast.rss).entries[0].title
+        num_daf = "".join([char for char in title if char.isdigit()])
+        links: m.podcast_links.Links = m.podcast_links.Links(title, f"kidushin-{num_daf}", podcast, m.config_manager)
+        links.title = links.title[:-20]
+        links.get_tiny_urls(["shloime-greenwald", "kidushin"])
+        links.send_whatsapp_msg()
 
     elif choice == "3":
         title = m.podcast_links.choose_episode(podcast)
         num_daf = "".join([char for char in title if char.isdigit()])
-        links: m.podcast_links.Links = m.podcast_links.Links(title, podcast, m.config_manager)
-        links.get_tiny_urls(f"kidushin-{num_daf}", ["shloime-greenwald", "kidushin"])
-        msg = f"""
-*{links.title[:-20]}*
-By Rabbi Shloimy Greenwald
-
-*YouTube Link*
-
-{links.youtube_short}
-
-*Spotify Link*
-
-{links.spotify_short}
-
-*Apple Link*
-
-{links.apple_short}
-"""
-        print(msg)
-        print(links)
+        links: m.podcast_links.Links = m.podcast_links.Links(title, f"kidushin-{num_daf}", podcast, m.config_manager)
+        links.title = links.title[:-20]
+        links.get_tiny_urls(["shloime-greenwald", "kidushin"])
+        links.send_whatsapp_msg()
