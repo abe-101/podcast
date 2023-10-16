@@ -140,7 +140,7 @@ def initialize_upload(youtube, options):
     body = {
         "snippet": {
             "title": options.title,
-            "description": options.description,
+            "description": options.description + "\n\nUploaded by: shiurim.net",
             "tags": tags,
             "categoryId": options.category,
         },
@@ -180,6 +180,7 @@ def upload_video_with_options(
     youtubedata = get_service()
     video_id = initialize_upload(youtubedata, options)
     video_url = "https://www.youtube.com/watch?v=%s" % video_id
+    video_url = "https://youtu.be/" + video_id
     print(video_url)
     add_video_to_playlist(youtubedata, video_id, playlist_id)
     localMedia.url = video_url
