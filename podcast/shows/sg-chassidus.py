@@ -1,8 +1,19 @@
+import feedparser
+
 import podcast.main as m
 
 podcast = m.PodcastInfo(m.config.playlists[m.config.SG_CHASSIDUS])
-title = "Likkutei Torah | Succos | Rabbi Shloimy Greenwald"
-short_name = "LT-Succos"
+title = ""
+short_name = "Chassidus-Lech-Lcha"
+
+
+def get_short_links():
+    title = feedparser.parse("https://feeds.captivate.fm/" + podcast.rss).entries[0].title
+    links: m.podcast_links.Links = m.podcast_links.Links(title, short_name, podcast, m.config_manager)
+    links.get_tiny_urls(["likutei-torah", "shloimy-greenwald"])
+    print(links)
+    links.send_whatsapp_msg()
+
 
 if "__main__" == __name__:
     choice = input("1 - convert YouTube video, 2 - convert local file, 3 - get links: ")
@@ -10,6 +21,9 @@ if "__main__" == __name__:
         url = input("Enter a YouTube URL: ")
         media: m.LocalMedia = m.download_yt.download_youtube_video(url, podcast.dir)
         episode = m.captivate_api.publish_podcast(local_media=media, podcast=podcast, config=m.config_manager)
+
+        m.wait_with_progressbar(15 * 60)
+        get_short_links()
 
     elif choice == "2":
         file = podcast.dir + "/" + title + ".m4a"
@@ -27,19 +41,20 @@ if "__main__" == __name__:
         m.captivate_api.add_youtute_id_to_podcast(podcast, m.config_manager, media)
         print(media.url)
 
+        m.wait_with_progressbar(8 * 60)
+        get_short_links()
+
     elif choice == "3":
-        title = m.podcast_links.choose_episode(podcast)
-        links: m.podcast_links.Links = m.podcast_links.Links(title, short_name, podcast, m.config_manager)
-        links.get_tiny_urls(["likutei-torah", "shloimy-greenwald"])
-        links.send_whatsapp_msg()
+        get_short_links()
 
     elif choice == "4":
-        previous = podcast.dir + "/" + "Likkutei Torah | Succos | Rabbi Shloimy Greenwald.m4a"
-        new = podcast.dir + "/" + "Likkutei Torah | Succos | Rabbi Shloimy Greenwald - Part 2.m4a"
+        previous = podcast.dir + "/" + "Torah Ohr | Parshas Noach | d”h Lihavin - Rabbi Shloimy Greenwald.mp3"
+        new = podcast.dir + "/" + "Torah Ohr | Parshas Noach | d”h Lihavin - Rabbi Shloimy Greenwald - Part 2.m4a"
+        new = m.audio_conversion.convert_m4a_to_mp3(new)
         title = new.split("/")[-1].split(".")[0]
-        episode_id = "df153ef7-5d49-469d-9816-510b4a465494"
+        episode_id = "716a1ea7-e77e-4f26-a6a3-da5a23c4c7b6"
 
-        m.add_audio_to_podcast(podcast, previous, new, episode_id, "m4a")
+        m.add_audio_to_podcast(podcast, previous, new, episode_id)
 
         video_pic = podcast.dir + "/" + podcast.name + ".jpg"
         media: m.LocalMedia = m.LocalMedia(file_name=new, title=title, description=title)

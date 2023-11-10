@@ -3,7 +3,7 @@ from imgurpython import ImgurClient
 
 import podcast.main as m
 
-podcast = m.PodcastInfo(m.config.playlists[m.config.KIDUSHIN])  # NOQA: F405
+podcast = m.PodcastInfo(m.config.playlists[m.config.BAVA_KAMAH])  # NOQA: F405
 
 
 def number_to_hebrew(num):
@@ -44,7 +44,7 @@ def number_to_hebrew(num):
 
 def get_title(daf_number):
     hebrew_daf = number_to_hebrew(daf_number)
-    title = f"Kidushin Daf {daf_number} - מסכת קידושין דף {hebrew_daf} - Rabbi S Greenwald"
+    title = f"Bava Kamah Daf {daf_number} - מסכת בבא קמא דף {hebrew_daf} - Rabbi S Greenwald"
     return title
 
 
@@ -67,9 +67,9 @@ def get_short_links():
     title = feedparser.parse("https://feeds.captivate.fm/" + podcast.rss).entries[0].title
     # title = m.podcast_links.choose_episode(podcast)
     num_daf = "".join([char for char in title if char.isdigit()])
-    links: m.podcast_links.Links = m.podcast_links.Links(title, f"kidushin-{num_daf}", podcast, m.config_manager)
+    links: m.podcast_links.Links = m.podcast_links.Links(title, f"Bava-Kamah-{num_daf}", podcast, m.config_manager)
     links.title = links.title[:-20]
-    links.get_tiny_urls(["shloime-greenwald", "kidushin"])
+    links.get_tiny_urls(["shloime-greenwald", "Bava-Kamah"])
     print(links)
     links.send_whatsapp_msg()
 
@@ -104,9 +104,9 @@ if "__main__" == __name__:
 {title}
 
 Available on all major podcast platforms:
-    https://My.Shiurim.net/kidushin-{num_daf}-Spotify
-    https://My.Shiurim.net/kidushin-{num_daf}-YouTube
-    https://My.Shiurim.net/kidushin-{num_daf}-Apple
+    https://My.Shiurim.net/Bava-Kamah-{num_daf}-Spotify
+    https://My.Shiurim.net/Bava-Kamah-{num_daf}-YouTube
+    https://My.Shiurim.net/Bava-Kamah-{num_daf}-Apple
 """
 
         print(description)
@@ -116,10 +116,11 @@ Available on all major podcast platforms:
             local_media=media, podcast=podcast, config=m.config_manager, episode_num=str(num_daf)
         )
 
-        video_pic = podcast.dir + "/YouTube/00" + num_daf + ".jpg"
+        video_pic = podcast.dir + "/youtube/00" + num_daf + ".png"
         media.file_name = m.audio_conversion.create_video_from_audio_and_picture(
             media.file_name, video_pic, podcast.dir + "/" + title + ".mp4"
         )
+        media.keywords = f"daf-{num_daf},bava-kamah,daf-yomi,daf-yomi-bava-kamah"
         media: m.LocalMedia = m.upload_video.upload_video_with_options(
             media, privacyStatus="public", playlist_id=podcast.playlist_id, channel_id=podcast.channel_id
         )
@@ -130,3 +131,27 @@ Available on all major podcast platforms:
 
     elif choice == "3":
         get_short_links()
+
+    elif choice == "4":
+        youtube_id = input("Enter the YouTube ID: ")
+        url = "https://youtu.be/" + youtube_id
+        daf_num = input("Enter the daf: ")
+        short_url = f"Bava-Kamah-{daf_num}-YouTube"
+        print(short_url)
+        print(m.config_manager.TINY_URL_API_KEY)
+        creator = m.tiny_url.TinyURLAPI(m.config_manager.TINY_URL_API_KEY)
+
+        tiny_url = creator.get_or_create_alias_url(
+            long_url=url, alias=short_url, tags=["shloime-greenwald", "bava-kamah", "youtube"]
+        )
+        template = f"""
+🔔 Tonight's Gemorah Shiur Reminder! 🔔
+
+Continuing our journey through Meseches Bava Kamah, we will be learning Daf {daf_num} tonight.
+
+📅 Tonight Live at 8:15 PM:
+📺 Join the *live* YouTube stream: {tiny_url}
+
+Looking forward to seeing you all there! 📚🔍
+"""
+        print(template)

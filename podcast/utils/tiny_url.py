@@ -71,7 +71,7 @@ class CreateAliasUrlError(Exception):
 
 
 class TinyURLAPI:
-    def __init__(self, api_token):
+    def __init__(self, api_token=config.TINY_URL_API_KEY):
         self.api_token = api_token
         self.url = "https://api.tinyurl.com/"
         self.headers = {
@@ -147,16 +147,21 @@ class TinyURLAPI:
 if "__main__" == __name__:
     # Example usage
     creator = TinyURLAPI(config.TINY_URL_API_KEY)
+    domain = "my.shiurim.net"
+    alias = "Lech-Lcha-3-YouTube"
     url_data = [
         URLData(
             operation=Operation.CREATE,
-            url="https://podcasts.apple.com/us/podcast/meseches-gittin-rabbi-shloime-greenwald/id1689640425",
-            domain="my.shiurim.net",
-            alias="Gittin-Apple-test2",
+            url="https://youtu.be/NMyTfjFr678",
+            domain=domain,
+            alias=alias,
+            tags=["Chumash", "shloime-greenwald", "youtube"],
         ),
     ]
     r = creator.bulk_create_short_urls(url_data)
-    print(r)
+    url = "https://" + domain + "/" + alias
+
+    print(capitalize_url(url))
 
     # url = creator.get_or_create_alias_url(
     #        "https://podcasts.apple.com/us/podcast/meseches-gittin-rabbi-shloime-greenwald/id1689640425",

@@ -160,7 +160,7 @@ def initialize_upload(youtube, options):
 def upload_video_with_options(
     localMedia: LocalMedia,
     category: str = "22",
-    keywords: str = "",
+    keywords: str = "rabbi shloime greenwald, kolel, rabbi s greenwald, shiurim.net",
     privacyStatus: str = "private",
     playlist_id: str = "",
     channel_id: str = "",
@@ -170,7 +170,7 @@ def upload_video_with_options(
         title=localMedia.title,
         description=localMedia.description,
         category=category,
-        keywords=keywords,
+        keywords=keywords + ", " + localMedia.keywords,
         privacyStatus=privacyStatus,
         channel_id=channel_id,
     )

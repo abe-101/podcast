@@ -130,8 +130,17 @@ def get_all_videos_from_playlist(youtube, playlist_id):
 
 podcast = m.PodcastInfo(m.config.playlists[m.config.SIMON])
 
-SHORT_NAME = "Soul-of-Yom-Kippur"
-YOU_TUBE_ID = "x57R3pkUigM"
+SHORT_NAME = "How-Story-Ishmael-Ends"
+YOU_TUBE_ID = "1fVVhbdBj-I"
+
+
+def get_short_links():
+    title = feedparser.parse("https://feeds.captivate.fm/" + podcast.rss).entries[0].title
+    links: m.podcast_links.Links = m.podcast_links.Links(title, SHORT_NAME, podcast, m.config_manager)
+    links.get_tiny_urls(["simon"])
+    print(links)
+    links.send_whatsapp_msg()
+
 
 if "__main__" == __name__:
     choice = input("1 - convert YouTube video, 2 - get links: ")
@@ -140,12 +149,11 @@ if "__main__" == __name__:
         media: m.LocalMedia = m.download_yt.download_youtube_video(url, podcast.dir)
         episode = m.captivate_api.publish_podcast(local_media=media, podcast=podcast, config=m.config_manager)
 
+        m.wait_with_progressbar(15 * 60)
+        get_short_links()
+
     if choice == "2":
-        title = feedparser.parse("https://feeds.captivate.fm/" + podcast.rss).entries[0].title
-        short_name = SHORT_NAME
-        links: m.podcast_links.Links = m.podcast_links.Links(title, short_name, podcast, m.config_manager)
-        links.get_tiny_urls(["simon"])
-        links.send_whatsapp_msg()
+        get_short_links()
 
     if choice == "3":
         youtube = get_new_videos(podcast)
@@ -158,3 +166,13 @@ if "__main__" == __name__:
                 local_media=media, podcast=podcast, config=m.config_manager, episode_num=1
             )
             count += 1
+    elif choice == "4":
+        youtube_id = YOU_TUBE_ID
+        url = "https://youtu.be/" + youtube_id
+        short_url = SHORT_NAME
+        creator = m.tiny_url.TinyURLAPI(m.config_manager.TINY_URL_API_KEY)
+
+        tiny_url = creator.get_or_create_alias_url(
+            long_url=url, alias=short_url, tags=["shloime-greenwald", "chumash", "youtube"]
+        )
+        print(tiny_url)

@@ -38,6 +38,8 @@ class LocalMedia:
         self.thumbnail = thumbnail
         self.upload_date = upload_date
         self.captivate_id = None
+        self.path_to_video = None
+        self.keywords = ""
 
     def __str__(self):
         return (
@@ -86,6 +88,7 @@ class ConfigurationManager:
         self.WHATSAPP_TOKEN = config.WHATSAPP_TOKEN
         self.WHATSAPP_BUISNESS_ID = config.WHATSAPP_BUISNESS_ID
         self.WHATSAPP_SENDER_ID = config.WHATSAPP_SENDER_ID
+        self.WHATSAPP_RECIPIENT_NUMBER = config.WHATSAPP_RECIPIENT_NUMBER
 
     def get_captivate_token(self):
         if self.CAPTIVATE_TOKEN is None:

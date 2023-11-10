@@ -1,4 +1,8 @@
 import logging
+import os
+import time
+
+from tqdm import tqdm
 
 import podcast.config as config
 from podcast.utils import (  # NOQA: F401
@@ -40,6 +44,36 @@ logger.addHandler(console_handler)
 
 def hello_world():
     print("Hello World!")
+
+
+def get_file_extension(file_path: str, file_name: str):
+    """
+    file_name is without an extension
+    check if file name exist with either mp3 or m4a extension
+    and return file name with extension
+    """
+    mp3_file = file_path + "/" + file_name + ".mp3"
+    m4a_file = file_path + "/" + file_name + ".m4a"
+    if os.path.exists(mp3_file):
+        print("File exists: " + mp3_file)
+        return mp3_file
+    elif os.path.exists(m4a_file):
+        print("File exists: " + m4a_file)
+        return m4a_file
+    else:
+        raise Exception("File does not exist")
+
+
+def wait_with_progressbar(duration_in_seconds):
+    for second_passed in tqdm(range(duration_in_seconds), desc="Waiting", unit="s"):
+        seconds_left = duration_in_seconds - second_passed
+        minutes_left = seconds_left // 60
+        seconds_left %= 60
+
+        # Print the remaining time, overwrite the current line with \r, and flush the output
+        print(f"\r{minutes_left}:{seconds_left}", end="", flush=True)
+        time.sleep(1)
+    print()  # Newline after completion
 
 
 def create_show_short_links(podcast: PodcastInfo, podcast_name: str = None):

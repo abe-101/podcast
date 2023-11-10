@@ -21,6 +21,8 @@ def run(
         return new_file
 
     print(f"Enhancing file {file_name}")
+    # Get the title of the file without the path
+    title = file_name.rsplit("/", 1)[-1]
     # Launch the chromium browser
     browser = playwright.chromium.launch(headless=config.PLAYWRITE_HEADLESS)
 
@@ -34,7 +36,16 @@ def run(
     # Go to the Adobe Podcast enhance page
     page.goto("https://podcast.adobe.com/enhance#")
     # Upload the audio file
-    page.get_by_label("Upload").set_input_files(file_name)
+    # page.get_by_label("Upload").set_input_files(file_name)
+    page.get_by_label("Choose files").set_input_files(file_name)
+    # wait for button to be enabled
+    selector = f'div.sc-kZZSDX.dDPgsv.track-item > div > span[title="{title}"]'
+    page.wait_for_selector(selector, timeout=6000000).click()  # waits up to 60 seconds
+
+    selector = f'div.sc-kZZSDX.iRMQhr.track-item > div > span[title="{title}"]'
+
+    page.wait_for_selector(selector, timeout=600000)  # waits up to 60 seconds
+
     # Wait for the "Download" button to become available
     page.get_by_role("button", name="Download").wait_for(timeout=600000)
 
