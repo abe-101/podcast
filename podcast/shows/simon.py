@@ -130,8 +130,8 @@ def get_all_videos_from_playlist(youtube, playlist_id):
 
 podcast = m.PodcastInfo(m.config.playlists[m.config.SIMON])
 
-SHORT_NAME = "How-Story-Ishmael-Ends"
-YOU_TUBE_ID = "1fVVhbdBj-I"
+SHORT_NAME = "The-Final-Frontier"
+YOU_TUBE_ID = "naWxIu9v91g"
 
 
 def get_short_links():
@@ -160,7 +160,7 @@ if "__main__" == __name__:
         n = len(youtube)
         count = 1
         for id, title in youtube:
-            print(f"Downloading:{count}/{n} - {title}")
+            print(f"Downloading: {count}/{n} - {title}")
             media: m.LocalMedia = m.download_yt.download_youtube_video(id, podcast.dir)
             episode = m.captivate_api.publish_podcast(
                 local_media=media, podcast=podcast, config=m.config_manager, episode_num=1
@@ -173,6 +173,6 @@ if "__main__" == __name__:
         creator = m.tiny_url.TinyURLAPI(m.config_manager.TINY_URL_API_KEY)
 
         tiny_url = creator.get_or_create_alias_url(
-            long_url=url, alias=short_url, tags=["shloime-greenwald", "chumash", "youtube"]
+            long_url=url, alias=short_url, tags=["simon", "chassidus", "youtube"]
         )
         print(tiny_url)

@@ -6,7 +6,7 @@ import podcast.main as m
 # m.config_manager.CAPTIVATE_API_KEY = "AHs0ibbMoLxTRRWmUw18ygIJtKMRUJj8tjvWxhNF"
 
 podcast = m.PodcastInfo(m.config.playlists[m.config.PLS])
-short_name = "pls-15-Chayei-Sarah-1"
+short_name = "3-pls-15-10-Teves"
 
 
 def get_short_links():
@@ -14,6 +14,18 @@ def get_short_links():
     links: m.podcast_links.Links = m.podcast_links.Links(title, short_name, podcast, m.config_manager)
     links.get_tiny_urls(["shloimy-greenwald", "pls"])
     print(links)
+    template = """
+*{title}*
+
+*YouTube Link*
+{youtube}
+
+*Spotify Link*
+{spotify}
+{apple}
+"""
+    print(links.generate_template(template))
+
     links.send_whatsapp_msg()
 
 
@@ -27,17 +39,17 @@ if "__main__" == __name__:
 
     elif choice == "2":
         # file = input("Enter the file name: ")
-        file = (
-            podcast.dir
-            + "/"
-            + "Likkutei Sichos | Volume 15 | Chayei Sarah | Sichah 5 Shabbos Kodesh Mevarchim Kislev.m4a"
-        )
+        file = podcast.dir + "/" + "Likkutei Sichos | Volume 15 | 10h of Teves.m4a"
         title = file.split("/")[-1].split(".")[0]
         file = m.adobe_podcast.enhance_podcast(file, m.config_manager)
         media: m.LocalMedia = m.LocalMedia(file_name=file, title=title, description=title)
         episode = m.captivate_api.publish_podcast(local_media=media, podcast=podcast, config=m.config_manager)
 
         video_pic = podcast.dir + "/" + podcast.name + ".jpg"
+        media.keywords = (
+            f"{short_name}, pls, project likutei sichos, Likkutei Sichos" "volume 15, 10th of teves, greenwald"
+        )
+
         media.file_name = m.audio_conversion.create_video_from_audio_and_picture(
             media.file_name, video_pic, podcast.dir + "/" + title + ".mp4"
         )
@@ -53,21 +65,15 @@ if "__main__" == __name__:
         get_short_links()
 
     elif choice == "4":
-        previous = (
-            podcast.dir + "/" "Likkutei Sichos | Volume 15 | Chayei Sarah | Sichah 5 Shabbos enhanced) (combined).mp3"
-        )
-        new = (
-            podcast.dir
-            + "/"
-            + "Part 3: Likkutei Sichos | Volume 15 | Chayei Sarah | Sichah 5 Shabbos Kodesh Mevarchim Kislev.m4a"
-        )
+        previous = podcast.dir + "/" + "Likkutei Sichos | Volume 15 | 10h of Teves (enhanced) (combined).mp3"
+        new = podcast.dir + "/" + "Part 3: Likkutei Sichos | Volume 15 | 10h of Teves.mp3"
         title = new.split("/")[-1].split(".")[0]
         # url = "kgcfZfxdwj0"
         # media: m.LocalMedia = m.download_yt.download_youtube_video(url, podcast.dir)
         # new = m.adobe_podcast.enhance_podcast(media.file_name, m.config_manager)
         # new = media.file_name
         new = m.adobe_podcast.enhance_podcast(new, m.config_manager)
-        episode_id = "3c1a473e-1777-416b-a600-74e8cd4742bf"
+        episode_id = "4ec3e362-7b95-40fd-b214-233e4f88212e"
 
         m.add_audio_to_podcast(podcast, previous, new, episode_id)
 
@@ -75,7 +81,7 @@ if "__main__" == __name__:
         media: m.LocalMedia = m.LocalMedia(file_name=new, title=title, description=title)
         media.keywords = (
             f"{short_name}, pls, project likutei sichos, Likkutei Sichos"
-            "volume 15, chayei sarah, sichah 5, shabbos kodesh mevarchim kislev"
+            "volume 15, toldos, sichah 5, part 3, greenwald"
         )
         media.file_name = m.audio_conversion.create_video_from_audio_and_picture(
             new, video_pic, podcast.dir + "/" + title + ".mp4"
@@ -89,5 +95,6 @@ if "__main__" == __name__:
         creator = m.tiny_url.TinyURLAPI(m.config_manager.TINY_URL_API_KEY)
 
         tiny_url = creator.get_or_create_alias_url(
-            long_url=url, alias=short_name, tags=["shloime-greenwald", "pls", "youtube"]
+            long_url=url, alias=short_name + "-YouTube", tags=["shloime-greenwald", "pls", "youtube"]
         )
+        print(tiny_url)

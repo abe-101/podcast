@@ -10,6 +10,11 @@ def number_to_hebrew(num):
     if num <= 0 or num > 200:
         raise ValueError("Number out of supported range")
 
+    if num == 15:
+        return "טו"
+    if num == 16:
+        return "טז"
+
     hebrew_numerals = {
         1: "א",
         2: "ב",
@@ -107,7 +112,7 @@ Available on all major podcast platforms:
     https://My.Shiurim.net/Bava-Kamah-{num_daf}-Spotify
     https://My.Shiurim.net/Bava-Kamah-{num_daf}-YouTube
     https://My.Shiurim.net/Bava-Kamah-{num_daf}-Apple
-"""
+"""  # NOQA: E231, E241
 
         print(description)
         media: m.LocalMedia = m.LocalMedia(file_name=file, title=title, description=description)
@@ -117,10 +122,11 @@ Available on all major podcast platforms:
         )
 
         video_pic = podcast.dir + "/youtube/00" + num_daf + ".png"
+        # video_pic = podcast.dir + "/youtube/00.png"
         media.file_name = m.audio_conversion.create_video_from_audio_and_picture(
             media.file_name, video_pic, podcast.dir + "/" + title + ".mp4"
         )
-        media.keywords = f"daf-{num_daf},bava-kamah,daf-yomi,daf-yomi-bava-kamah"
+        media.keywords = f"daf-{num_daf},bava-kamah,daf-yomi,daf-yomi-bava-kamah"  # NOQA: E231
         media: m.LocalMedia = m.upload_video.upload_video_with_options(
             media, privacyStatus="public", playlist_id=podcast.playlist_id, channel_id=podcast.channel_id
         )
@@ -147,11 +153,11 @@ Available on all major podcast platforms:
         template = f"""
 🔔 Tonight's Gemorah Shiur Reminder! 🔔
 
-Continuing our journey through Meseches Bava Kamah, we will be learning Daf {daf_num} tonight.
+Continuing our journey through Meseches Bava Kamah, we will be learning Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf {daf_num} tonight.
 
 📅 Tonight Live at 8:15 PM:
 📺 Join the *live* YouTube stream: {tiny_url}
 
 Looking forward to seeing you all there! 📚🔍
-"""
+"""  # NOQA: E231
         print(template)

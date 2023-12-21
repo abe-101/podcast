@@ -3,13 +3,14 @@ import re
 import feedparser
 import requests
 from bs4 import BeautifulSoup
-from discord import SyncWebhook
 
 from podcast.utils.apple import get_shows_apple_episode_links
 from podcast.utils.configuration_manager import ConfigurationManager, PodcastInfo
 from podcast.utils.spotify import get_spotify_episode_links
 from podcast.utils.tiny_url import TinyURLAPI
 from podcast.utils.whatsapp import send_whatsapp_message
+
+# from discord import SyncWebhook
 
 
 class Links:
@@ -37,7 +38,7 @@ class Links:
         youtube_tag = tags.copy()
         youtube_tag.append("youtube")
         self.youtube_short = create.get_or_create_alias_url(
-            f"https://youtu.be/{self.youtube}",
+            f"https://youtu.be/{self.youtube}",  # noqa E231
             f"{short_name}-YouTube",
             tags=youtube_tag,
         )
@@ -89,7 +90,7 @@ Captivate.fm - {self.captivatefm}
 {self.apple_short}
 
 {self.captivatefm_short}
-"""
+"""  # noqa E222, E221
 
     def default_template(self) -> str:
         """Returns the default template for WhatsApp."""
@@ -122,9 +123,9 @@ Captivate.fm - {self.captivatefm}
         if "{captivatefm}" in template and self.captivatefm:
             output = output.replace("{captivatefm}", self.captivatefm_short)
 
-        webhook = SyncWebhook.from_url(self.config.DISCORD_WEBHOOK_URL)
+        # webhook = SyncWebhook.from_url(self.config.DISCORD_WEBHOOK_URL)
         output = output.strip()
-        webhook.send(output)
+        # webhook.send(output)
 
         return output
 

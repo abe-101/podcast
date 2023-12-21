@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 
 from playwright.sync_api import Playwright, sync_playwright
 
@@ -35,16 +36,65 @@ def run(
     page = context.new_page()
     # Go to the Adobe Podcast enhance page
     page.goto("https://podcast.adobe.com/enhance#")
+    print("Waiting 5 sec for the page to load")
+    time.sleep(5)
+
+    # Wait for the page to load
+
     # Upload the audio file
     # page.get_by_label("Upload").set_input_files(file_name)
-    page.get_by_label("Choose files").set_input_files(file_name)
-    # wait for button to be enabled
-    selector = f'div.sc-kZZSDX.dDPgsv.track-item > div > span[title="{title}"]'
-    page.wait_for_selector(selector, timeout=6000000).click()  # waits up to 60 seconds
+    # check if there is a div with title in it if yes download it
+    # else upload the file
+    title_selector = f'div > span[title="{title}"]'
+    enhancing_text_selector = "text=Enhancing speech…"
+    uploading_text_selector = "text=Uploading…"
+    if page.query_selector(title_selector):
+        print("File already uploaded")
+        page.query_selector(title_selector).click()
 
-    selector = f'div.sc-kZZSDX.iRMQhr.track-item > div > span[title="{title}"]'
+    else:
+        page.get_by_label("Choose files").set_input_files(file_name)
+        print("Waiting for the file to be uploaded")
+        # wait for button to be enabled
 
-    page.wait_for_selector(selector, timeout=600000)  # waits up to 60 seconds
+        # Wait for the file title to appear
+        page.wait_for_selector(title_selector)
+        time.sleep(5)
+
+        print("Waiting for the file to be enhanced")
+        count = 0
+        while True:
+            # Check if the "Enhancing speech…" text is still present on the page
+            if not page.query_selector(enhancing_text_selector) and not page.query_selector(uploading_text_selector):
+                time.sleep(5)
+                page.wait_for_selector(title_selector).click()
+                print("Enhancing done")
+                break
+            print(f"Still enhancing{'.' * (count % 4)}", end="\r")
+            time.sleep(5)  # Wait for a few seconds before checking again
+            count += 1
+
+        # Now continuously check if "Enhancing speech" is still present with the file title
+        # while True:
+        #    # Find all elements that contain the text "Enhancing speech…"
+        #    enhancing_elements = page.query_selector_all(enhancing_text_selector)
+        #    # Check if any of these elements are associated with the file title
+        #    is_enhancing = any(title in element.inner_text() for element in enhancing_elements)
+        #    if not is_enhancing:
+        #        page.wait_for_selector(title_selector).click()
+        #        break
+
+        #    time.sleep(5)  # Wait for a few seconds before checking again
+        #    print("Still enhancing…")
+
+        # selector = f'div.sc-bQlsKK.ceozLy.track-item > div > span[title="{title}"]'
+        # page.wait_for_selector(selector, timeout=6000000).click()  # waits up to 60 seconds
+        # print("Waiting for button to be enabled")
+
+        # selector = f'div.sc-bQlsKK.hOcYTr.track-item > div > span[title="{title}"]'
+
+        # page.wait_for_selector(selector, timeout=600000)  # waits up to 60 seconds
+        # print("Waiting for button to be enabled")
 
     # Wait for the "Download" button to become available
     page.get_by_role("button", name="Download").wait_for(timeout=600000)

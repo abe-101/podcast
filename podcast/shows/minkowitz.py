@@ -11,11 +11,11 @@ zohar: m.PodcastInfo = m.PodcastInfo(m.config.playlists[m.config.RM_ZOHAR])
 MAMMOR_ID = None
 ZOHAR_ID = None
 
-MAMMOR_ID = "2tB71G5WBwI"
-MAMMOR_SHORT = "Key-to-A-New-Light"
+MAMMOR_ID = "EF0OdQqn-_g"
+MAMMOR_SHORT = "Decent-for-Ascent"
 
 ZOHAR_ID = ""
-ZOHAR_SHORT = "Zohar-Chayei-Sara"
+ZOHAR_SHORT = "Zohar-Vayeitzei"
 
 
 if len(MAMMOR_SHORT) > 23 or len(ZOHAR_SHORT) > 23:

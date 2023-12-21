@@ -9,7 +9,9 @@ from http.client import IncompleteRead
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
 
-from .configuration_manager import LocalMedia
+from podcast.utils.adobe_podcast import enhance_podcast
+
+from .configuration_manager import ConfigurationManager, LocalMedia
 
 
 def clean_video_title(title):
@@ -39,9 +41,11 @@ def download_youtube_video(
             "outtmpl": f"{folder_path}/%(id)s.%(ext)s",
             "keepvideo": True,
             "live_from_start": True,
+            # "prefer-ffmpeg": True,
+            "audio-format": "mp3",
             # 'concurrent_fragment_downloads': 4,
             "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}],
-            "no_windows_filenames": True,
+            # "no_windows_filenames": True,
         }
     ) as ydl:
         retry_count = 0
@@ -75,10 +79,15 @@ def download_youtube_video(
                     print(f"Download attempt {retry_count} failed with error: {e}. Retrying...")
             else:
                 print(f"Failed to download the video after {max_retries} attempts.")
-                return None
+                m4a_file_name = f"{folder_path}/{video_info['id']}.m4a"
+                if os.path.exists(m4a_file_name):
+                    print("M4A file exists. Enhancing...")
+
+                    id_name = enhance_podcast(m4a_file_name, config=ConfigurationManager())
+                    os.rename(id_name, file_name)
 
     if len(url) == 11:
-        url = f"https://www.youtube.com/watch?v={url}"
+        url = f"https://www.youtube.com/watch?v={url}"  # NOQA: E231
 
     local_media = LocalMedia(
         file_name=file_name,

@@ -3,8 +3,8 @@ import feedparser
 import podcast.main as m
 
 podcast = m.PodcastInfo(m.config.playlists[m.config.SG_CHASSIDUS])
-title = ""
-short_name = "Chassidus-Lech-Lcha"
+title = "Mamor Bada Bishalom - Melukut 6 page 45"
+short_name = "3-Chanukah-Maamar-Vol-2"
 
 
 def get_short_links():
@@ -35,6 +35,9 @@ if "__main__" == __name__:
         media.file_name = m.audio_conversion.create_video_from_audio_and_picture(
             media.file_name, video_pic, podcast.dir + "/" + title + ".mp4"
         )
+        media.keywords = (
+            "chassidus, chassidut, chassidic, maamor, pada bishalom, badi bishalom, rabbi shloime greenwald, greenwald"
+        )
         media: m.LocalMedia = m.upload_video.upload_video_with_options(
             media, privacyStatus="public", playlist_id=podcast.playlist_id, channel_id=podcast.channel_id
         )
@@ -48,11 +51,11 @@ if "__main__" == __name__:
         get_short_links()
 
     elif choice == "4":
-        previous = podcast.dir + "/" + "Torah Ohr | Parshas Noach | d”h Lihavin - Rabbi Shloimy Greenwald.mp3"
-        new = podcast.dir + "/" + "Torah Ohr | Parshas Noach | d”h Lihavin - Rabbi Shloimy Greenwald - Part 2.m4a"
+        previous = podcast.dir + "/" + "Chanukah Maamar Vol. 2, תנו רבנן- Part 1 (combined).mp3"
+        new = podcast.dir + "/" + "Chanukah Maamar Vol. 2, תנו רבנן- Part 3.m4a"
         new = m.audio_conversion.convert_m4a_to_mp3(new)
         title = new.split("/")[-1].split(".")[0]
-        episode_id = "716a1ea7-e77e-4f26-a6a3-da5a23c4c7b6"
+        episode_id = "02b94846-7b97-4296-bb1d-59b0d6da4131"
 
         m.add_audio_to_podcast(podcast, previous, new, episode_id)
 

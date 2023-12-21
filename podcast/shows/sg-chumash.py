@@ -6,13 +6,13 @@ from imgurpython import ImgurClient
 import podcast.main as m
 
 podcast = m.PodcastInfo(m.config.playlists[m.config.SG_CHUMASH])  # NOQA: F405
-PARSHA = "Chayei-Sarah"
+PARSHA = "Vayigash"
 
 
 def get_thumbnail_link(parsha, num_day):
     try:
         client = ImgurClient(m.config.IMGUR_CLIENT_ID, m.config.IMGUR_CLIENT_SECRET)  # NOQA: F405
-        pic = podcast.dir + "/podcast/" + parsha + ".jpg"
+        pic = podcast.dir + "/youtube/" + parsha + ".jpg"
         uploaded_image = client.upload_from_path(pic)
         artwork = uploaded_image["link"]
         return artwork
@@ -23,7 +23,7 @@ def get_thumbnail_link(parsha, num_day):
 def get_chumash_text(num_day):
     today = datetime.today() + timedelta(days=1)
     tommorow = today.strftime("%m/%d/%Y")
-    chumash_text = f"https://www.chabad.org/dailystudy/torahreading.asp?tDate={tommorow}"
+    chumash_text = f"https://www.chabad.org/dailystudy/torahreading.asp?tDate={tommorow}"  # NOQA: E231
 
     creator = m.tiny_url.TinyURLAPI()
     chumash_link = creator.get_or_create_alias_url(
@@ -77,7 +77,7 @@ if "__main__" == __name__:
 
     elif choice == "2":
         num_day = input("Enter the day of the week: ")
-        file = f"{podcast.dir}/{PARSHA}-{num_day}.m4a"
+        file = m.get_file_extension(podcast.dir, f"{PARSHA}-{num_day}")
         print(file)
         title = f"Daily Chumash & Rashi: {PARSHA} - Portion {num_day}"
         was_m4a = m.audio_conversion.convert_m4a_to_mp3(file)
@@ -86,10 +86,10 @@ if "__main__" == __name__:
             file = was_m4a
         file = m.adobe_podcast.enhance_podcast(file, m.config_manager)
         description = f"""
-Dive into Part {num_day} of {PARSHA} with Rabbi Shloimy Greenwald,
+Dive into Portion {num_day} of {PARSHA} with Rabbi Shloimy Greenwald,
 
 as we explore its teachings guided by the daily Chitas schedule.
-"""
+"""  # NOQA: E231, E272
         media: m.LocalMedia = m.LocalMedia(file_name=file, title=title, description=description)
         media.thumbnail = get_thumbnail_link(PARSHA, num_day)
 
@@ -113,7 +113,7 @@ as we explore its teachings guided by the daily Chitas schedule.
         youtube_id = input("Enter the YouTube ID: ")
         url = "https://youtu.be/" + youtube_id
         day_num = input("Enter the day of the week: ")
-        short_url = f"{PARSHA}-{day_num}"
+        short_url = f"{PARSHA}-{day_num}-YouTube"
         print(short_url)
         print(m.config_manager.TINY_URL_API_KEY)
         creator = m.tiny_url.TinyURLAPI(m.config_manager.TINY_URL_API_KEY)
@@ -131,6 +131,6 @@ Join us tonight at 7:45 PM for a deep dive into this week's portion.
 
 Looking forward to seeing you all there! 📚🔍
 
-Follow along at: {chumash_text}
-"""
+Follow along at: t: t:  t: :  t: :  t: :  t: :  t: :  t: :  t: :  t: :  t: :  t: {chumash_text}
+"""  # NOQA: E231, E241, E203
         print(template)
