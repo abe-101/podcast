@@ -130,8 +130,8 @@ def get_all_videos_from_playlist(youtube, playlist_id):
 
 podcast = m.PodcastInfo(m.config.playlists[m.config.SIMON])
 
-SHORT_NAME = "The-Final-Frontier"
-YOU_TUBE_ID = "naWxIu9v91g"
+SHORT_NAME = "Lessons-from-Vayechi"
+YOU_TUBE_ID = "sShnH7Z-zWA"
 
 
 def get_short_links():

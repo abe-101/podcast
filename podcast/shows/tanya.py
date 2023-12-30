@@ -139,7 +139,7 @@ Available on all major podcast platforms:
         )
         m.captivate_api.add_youtute_id_to_podcast(podcast, m.config_manager, media)
 
-        m.wait_with_progressbar(8 * 60)
+        m.wait_with_progressbar(10 * 60)
         get_short_links(date)
 
     elif choice == "3":

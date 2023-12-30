@@ -6,7 +6,7 @@ import podcast.main as m
 # m.config_manager.CAPTIVATE_API_KEY = "AHs0ibbMoLxTRRWmUw18ygIJtKMRUJj8tjvWxhNF"
 
 podcast = m.PodcastInfo(m.config.playlists[m.config.PLS])
-short_name = "3-pls-15-10-Teves"
+short_name = "2-pls-20-Vayechi"
 
 
 def get_short_links():
@@ -39,7 +39,7 @@ if "__main__" == __name__:
 
     elif choice == "2":
         # file = input("Enter the file name: ")
-        file = podcast.dir + "/" + "Likkutei Sichos | Volume 15 | 10h of Teves.m4a"
+        file = podcast.dir + "/" + "Likkutei Sichos Volume 20 | Parshas Vayechi - Rabbi Shloimy Greenwald.m4a"
         title = file.split("/")[-1].split(".")[0]
         file = m.adobe_podcast.enhance_podcast(file, m.config_manager)
         media: m.LocalMedia = m.LocalMedia(file_name=file, title=title, description=title)
@@ -65,15 +65,17 @@ if "__main__" == __name__:
         get_short_links()
 
     elif choice == "4":
-        previous = podcast.dir + "/" + "Likkutei Sichos | Volume 15 | 10h of Teves (enhanced) (combined).mp3"
-        new = podcast.dir + "/" + "Part 3: Likkutei Sichos | Volume 15 | 10h of Teves.mp3"
+        previous = (
+            podcast.dir + "/" + "Likkutei Sichos Volume 20 | Parshas Vayechi - Rabbi Shloimy Greenwald (enhanced).mp3"
+        )
+        new = podcast.dir + "/" + "Part 2: Likkutei Sichos Volume 20 | Parshas Vayechi - Rabbi Shloimy Greenwald.m4a"
         title = new.split("/")[-1].split(".")[0]
         # url = "kgcfZfxdwj0"
         # media: m.LocalMedia = m.download_yt.download_youtube_video(url, podcast.dir)
         # new = m.adobe_podcast.enhance_podcast(media.file_name, m.config_manager)
         # new = media.file_name
         new = m.adobe_podcast.enhance_podcast(new, m.config_manager)
-        episode_id = "4ec3e362-7b95-40fd-b214-233e4f88212e"
+        episode_id = "8a01f110-d071-4229-a0c8-d2581f7ab1d6"
 
         m.add_audio_to_podcast(podcast, previous, new, episode_id)
 

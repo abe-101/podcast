@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 
 import feedparser
 from imgurpython import ImgurClient
@@ -6,13 +6,13 @@ from imgurpython import ImgurClient
 import podcast.main as m
 
 podcast = m.PodcastInfo(m.config.playlists[m.config.SG_CHUMASH])  # NOQA: F405
-PARSHA = "Vayigash"
+PARSHA = "Shemos"
 
 
 def get_thumbnail_link(parsha, num_day):
     try:
         client = ImgurClient(m.config.IMGUR_CLIENT_ID, m.config.IMGUR_CLIENT_SECRET)  # NOQA: F405
-        pic = podcast.dir + "/youtube/" + parsha + ".jpg"
+        pic = podcast.dir + "/podcast/" + parsha + ".jpg"
         uploaded_image = client.upload_from_path(pic)
         artwork = uploaded_image["link"]
         return artwork
@@ -21,15 +21,28 @@ def get_thumbnail_link(parsha, num_day):
 
 
 def get_chumash_text(num_day):
-    today = datetime.today() + timedelta(days=1)
-    tommorow = today.strftime("%m/%d/%Y")
-    chumash_text = f"https://www.chabad.org/dailystudy/torahreading.asp?tDate={tommorow}"  # NOQA: E231
+    """Gets the Chumash text for the specified day of the week.
 
-    creator = m.tiny_url.TinyURLAPI()
-    chumash_link = creator.get_or_create_alias_url(
-        long_url=chumash_text, alias=f"{PARSHA}-{num_day}-Text", tags=["shloime-greenwald", "chumash", "text"]
-    )
-    return chumash_link
+    Args:
+        num_day (int): The day of the week (0 for Monday, 6 for Sunday).
+
+    Returns:
+        str: The URL for the Chumash text for the specified day.
+    """
+
+    today = date.today()
+    weekday = today.weekday()  # Get the current weekday (0-6)
+
+    # Calculate the target date based on the given num_day
+    target_weekday = (weekday + num_day) % 7
+    target_date = today + timedelta(days=(target_weekday - weekday) + 1)
+
+    # Format the date as mm/dd/yyyy
+    formatted_date = target_date.strftime("%m/%d/%Y")
+
+    chumash_text = f"https://www.chabad.org/dailystudy/torahreading.asp?tDate={formatted_date}"  # NOQA: E231
+
+    return chumash_text
 
 
 def get_short_links():
@@ -131,6 +144,6 @@ Join us tonight at 7:45 PM for a deep dive into this week's portion.
 
 Looking forward to seeing you all there! 📚🔍
 
-Follow along at: t: t:  t: :  t: :  t: :  t: :  t: :  t: :  t: :  t: :  t: :  t: {chumash_text}
+Follow along at: {chumash_text}
 """  # NOQA: E231, E241, E203
         print(template)

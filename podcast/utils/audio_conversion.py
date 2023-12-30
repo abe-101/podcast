@@ -87,7 +87,7 @@ def convert_wav_to_mp3(input_file: str, output_file: str | None = None) -> str:
     return output_file
 
 
-def combine_mp3_files(file1: str, file2: str) -> str:
+def combine_mp3_files(file1: str, file2: str, file3: str = None, new_name: str = None) -> str:
     """Combine two mp3 files into one.
 
     :param file1: The path to the first mp3 file.
@@ -97,10 +97,19 @@ def combine_mp3_files(file1: str, file2: str) -> str:
     :return: The combined audio.
     :rtype: AudioSegment
     """
+    if new_name:
+        new = new_name
+    else:
+        new = file1.rsplit(".", 1)[0] + " (combined).mp3"
+    if os.path.exists(new):
+        print(f"file: {new}\n---\n   \\ was already created, skipping")
+        return new
     sound1 = AudioSegment.from_mp3(file1)
     sound2 = AudioSegment.from_mp3(file2)
     combined = sound1 + sound2
-    new = file1.rsplit(".", 1)[0] + " (combined).mp3"
+    if file3:
+        sound3 = AudioSegment.from_mp3(file3)
+        combined += sound3
     combined.export(new, format="mp3")
     return new
 

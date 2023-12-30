@@ -4,7 +4,7 @@ import podcast.main as m
 
 podcast = m.PodcastInfo(m.config.playlists[m.config.SG_CHASSIDUS])
 title = "Mamor Bada Bishalom - Melukut 6 page 45"
-short_name = "3-Chanukah-Maamar-Vol-2"
+short_name = "Bassi-Ligani-5764"
 
 
 def get_short_links():
@@ -51,11 +51,15 @@ if "__main__" == __name__:
         get_short_links()
 
     elif choice == "4":
-        previous = podcast.dir + "/" + "Chanukah Maamar Vol. 2, תנו רבנן- Part 1 (combined).mp3"
-        new = podcast.dir + "/" + "Chanukah Maamar Vol. 2, תנו רבנן- Part 3.m4a"
+        previous = (
+            podcast.dir + "/" + "Basi Ligani | ד״ה צדקת פרזונו בישראל - תשכ''ד | Part 1 - Rabbi Shloimy Greenwald.mp3"
+        )
+        new = (
+            podcast.dir + "/" + "Basi Ligani | ד״ה צדקת פרזונו בישראל - תשכ''ד | Part 2 - Rabbi Shloimy Greenwald.m4a"
+        )
         new = m.audio_conversion.convert_m4a_to_mp3(new)
         title = new.split("/")[-1].split(".")[0]
-        episode_id = "02b94846-7b97-4296-bb1d-59b0d6da4131"
+        episode_id = "96d10fbb-6b5f-40d2-8363-7f2f2691df54"
 
         m.add_audio_to_podcast(podcast, previous, new, episode_id)
 
@@ -67,3 +71,18 @@ if "__main__" == __name__:
         media: m.LocalMedia = m.upload_video.upload_video_with_options(
             media, privacyStatus="public", playlist_id=podcast.playlist_id, channel_id=podcast.channel_id
         )
+    elif choice == "5":
+        youtube_id = input("Enter the YouTube ID: ")
+        url = "https://youtu.be/" + youtube_id
+        creator = m.tiny_url.TinyURLAPI(m.config_manager.TINY_URL_API_KEY)
+
+        tiny_url = creator.get_or_create_alias_url(
+            long_url=url, alias=short_name + "-YouTube", tags=["shloime-greenwald", "chassidus", "youtube"]
+        )
+        print(tiny_url)
+    elif choice == "6":
+        url = input("Enter a YouTube URL: ")
+        media: m.LocalMedia = m.download_yt.download_youtube_video(url, podcast.dir)
+        previous = podcast.dir + "/" + "Basi Ligani | מאמר באתי לגני - תשכ''ד | Part 1 - Rabbi Shloimy Greenwald.mp3"
+        episode_id = "a1ed7e93-33d0-4a2d-b8a9-023d8a604e5f"
+        m.add_audio_to_podcast(podcast, previous, media.file_name, episode_id)

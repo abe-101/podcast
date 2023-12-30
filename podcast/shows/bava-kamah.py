@@ -153,7 +153,7 @@ Available on all major podcast platforms:
         template = f"""
 🔔 Tonight's Gemorah Shiur Reminder! 🔔
 
-Continuing our journey through Meseches Bava Kamah, we will be learning Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf g Daf {daf_num} tonight.
+Continuing our journey through Meseches Bava Kamah, we will be learning Daf {daf_num} tonight.
 
 📅 Tonight Live at 8:15 PM:
 📺 Join the *live* YouTube stream: {tiny_url}
